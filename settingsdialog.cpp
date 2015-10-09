@@ -6,6 +6,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Натсройки");
     settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
     baseType = settings->value("base/type", SERVER).toString();
     if(baseType == SERVER)

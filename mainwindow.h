@@ -9,6 +9,7 @@
 #include <QTimer>
 #include "database.h"
 #include "settingsdialog.h"
+#include "basewizarddialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,8 +34,12 @@ private:
 private slots:
     // Слот настройки формочки
     void configUi();
+    // слот для таймера проверки статуса
     void statusCheck();
+
+    // пункты меню
     void openSettings();
+    void openBaseWizard();
 };
 
 #endif // MAINWINDOW_H

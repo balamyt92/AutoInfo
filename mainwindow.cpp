@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     connect(ui->actionSettings,SIGNAL(triggered(bool)),this, SLOT(openSettings()));
+    connect(ui->actionBase,SIGNAL(triggered(bool)),this, SLOT(openBaseWizard()));
 }
 
 MainWindow::~MainWindow()
@@ -61,4 +62,13 @@ void MainWindow::openSettings()
     settings->setValue("SettingsDialog/geometry", sd->saveGeometry());
     delete sd;
     settings->sync();
+}
+
+void MainWindow::openBaseWizard()
+{
+    BaseWizardDialog *bwd = new BaseWizardDialog(this);
+    bwd->restoreGeometry(settings->value("BaseWizardDialog/geometry").toByteArray());
+    bwd->exec();
+    settings->setValue("BaseWizardDialog/geometry", bwd->saveGeometry());
+    delete bwd;
 }

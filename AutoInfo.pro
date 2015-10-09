@@ -15,15 +15,18 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     database.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    basewizarddialog.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
     settingsdialog.h \
-    constants.h
+    constants.h \
+    basewizarddialog.h
 
 FORMS    += mainwindow.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    basewizarddialog.ui
 
 RESOURCES += \
     res.qrc

@@ -28,6 +28,7 @@ private:
     QSettings       *settings;
     QLabel          statusLine;
     QLabel          statusIcon;
+    QTimer          *timer;
 
 private slots:
     // Слот настройки формочки

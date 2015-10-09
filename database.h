@@ -20,7 +20,7 @@ class DataBase : public QObject
 public:
     explicit DataBase(QObject *parent = 0);
     ~DataBase();
-    void connectToDataBase(QSettings *settings_);
+    void connectToDataBase();
     QString getBaseName();
     QString getBaseType();
     bool getConnectStatus();
@@ -33,7 +33,8 @@ private:
     QSettings       *settings;
     QSqlDatabase    db;
 
-    bool openDataBase();
+    bool openServerBase();
+    bool openLocalBase();
 
 signals:
 

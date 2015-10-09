@@ -6,17 +6,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-}
-
-SettingsDialog::~SettingsDialog()
-{
-    delete ui;
-}
-
-void SettingsDialog::setSettings(QSettings *settings_)
-{
-    this->settings = settings_;
-
+    settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
     baseType = settings->value("base/type", SERVER).toString();
     if(baseType == SERVER)
     {
@@ -33,6 +23,10 @@ void SettingsDialog::setSettings(QSettings *settings_)
     }
 }
 
+SettingsDialog::~SettingsDialog()
+{
+    delete ui;
+}
 
 void SettingsDialog::on_buttonBox_accepted()
 {

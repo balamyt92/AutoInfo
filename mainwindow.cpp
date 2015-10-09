@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     database.connectToDataBase();
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(statusCheck()));
-    timer->start();
+    timer->start(1000);
     this->statusCheck();
     ui->statusBar->addWidget(&statusIcon);
     ui->statusBar->addWidget(&statusLine);

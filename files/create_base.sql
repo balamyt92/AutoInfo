@@ -1,0 +1,364 @@
+-- MySQL Workbench Synchronization
+-- Generated: 2015-09-28 19:31
+-- Model: New Model
+-- Version: 1.0
+-- Project: Name of the project
+-- Author: Admin
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarBodyModelGroupsEN` (
+  `ID_BodyGroup` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_BodyModel` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Model` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`ID_BodyGroup`, `ID_BodyModel`, `ID_Mark`, `ID_Model`)  COMMENT '',
+  INDEX `BodyGroup2_idx` (`ID_BodyModel` ASC)  COMMENT '',
+  INDEX `BodyGroup_idx` (`ID_BodyGroup` ASC, `ID_Mark` ASC, `ID_Model` ASC)  COMMENT '',
+  CONSTRAINT `BodyGroup`
+    FOREIGN KEY (`ID_BodyGroup` , `ID_Mark` , `ID_Model`)
+    REFERENCES `auto`.`CarBodyModelsEN` (`ID` , `ID_Mark` , `ID_Model`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `BodyGroup2`
+    FOREIGN KEY (`ID_BodyModel`)
+    REFERENCES `auto`.`CarBodyModelsEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarBodyModelsEN` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Model` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Name` VARCHAR(50) NOT NULL COMMENT '',
+  `ID_Uses` INT(11) NOT NULL DEFAULT 1 COMMENT '',
+  `ID_Type` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  INDEX (`ID` ASC)  COMMENT '',
+  PRIMARY KEY (`ID`, `ID_Mark`, `ID_Model`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarENDetailNames` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `Name` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarEngineAndBodyCorrespondencesEN` (
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Model` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Body` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Engine` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`ID_Mark`, `ID_Model`, `ID_Body`, `ID_Engine`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarEngineAndModelCorrespondencesEN` (
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Engine` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Model` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  INDEX (`ID_Engine` ASC)  COMMENT '',
+  INDEX (`ID_Mark` ASC)  COMMENT '',
+  INDEX (`ID_Model` ASC)  COMMENT '',
+  PRIMARY KEY (`ID_Mark`, `ID_Engine`, `ID_Model`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarEngineModelGroupsEN` (
+  `ID_EngineGroup` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_EngineModel` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  INDEX (`ID_EngineGroup` ASC)  COMMENT '',
+  INDEX (`ID_EngineModel` ASC)  COMMENT '',
+  INDEX (`ID_Mark` ASC)  COMMENT '',
+  PRIMARY KEY (`ID_EngineGroup`, `ID_EngineModel`, `ID_Mark`)  COMMENT '',
+  INDEX `EngineGroup_idx` (`ID_EngineModel` ASC, `ID_Mark` ASC)  COMMENT '',
+  CONSTRAINT `EngineGroup`
+    FOREIGN KEY (`ID_EngineModel` , `ID_Mark`)
+    REFERENCES `auto`.`CarEngineModelsEN` (`ID` , `ID_Mark`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `EngineGroup2`
+    FOREIGN KEY (`ID_EngineGroup`)
+    REFERENCES `auto`.`CarEngineModelsEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarEngineModelsEN` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Name` VARCHAR(50) NOT NULL COMMENT '',
+  `ID_Uses` INT(11) NOT NULL DEFAULT 1 COMMENT '',
+  `ID_Type` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  INDEX (`ID` ASC)  COMMENT '',
+  INDEX (`ID_Mark` ASC)  COMMENT '',
+  PRIMARY KEY (`ID`, `ID_Mark`)  COMMENT '',
+  INDEX `EngineModelType_idx` (`ID_Type` ASC)  COMMENT '',
+  CONSTRAINT `EngineModelType`
+    FOREIGN KEY (`ID_Type`)
+    REFERENCES `auto`.`ModelTypes` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `EngineMarks`
+    FOREIGN KEY (`ID_Mark`)
+    REFERENCES `auto`.`CarMarksEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarENLinkedDetailNames` (
+  `ID_GroupDetail` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_LinkedDetail` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`ID_GroupDetail`, `ID_LinkedDetail`)  COMMENT '',
+  INDEX `LinkDetail_idx` (`ID_LinkedDetail` ASC)  COMMENT '',
+  CONSTRAINT `LinkDetail`
+    FOREIGN KEY (`ID_LinkedDetail`)
+    REFERENCES `auto`.`CarENDetailNames` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `LinkDetail2`
+    FOREIGN KEY (`ID_GroupDetail`)
+    REFERENCES `auto`.`CarENDetailNames` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarMarkGroupsEN` (
+  `ID_Group` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`ID_Group`, `ID_Mark`)  COMMENT '',
+  INDEX `GroupMarks2_idx` (`ID_Mark` ASC)  COMMENT '',
+  CONSTRAINT `GroupMarks`
+    FOREIGN KEY (`ID_Mark`)
+    REFERENCES `auto`.`CarMarksEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `GroupMarks2`
+    FOREIGN KEY (`ID_Mark`)
+    REFERENCES `auto`.`CarMarksEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarMarksEN` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `Name` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  `ID_Type` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '',
+  INDEX `MarkTypeKey_idx` (`ID_Type` ASC)  COMMENT '',
+  CONSTRAINT `MarkTypeKey`
+    FOREIGN KEY (`ID_Type`)
+    REFERENCES `auto`.`MarkTypes` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarModelGroupsEN` (
+  `ID_Group` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Model` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`ID_Group`, `ID_Model`, `ID_Mark`)  COMMENT '',
+  INDEX `GroupModel_idx` (`ID_Model` ASC, `ID_Mark` ASC)  COMMENT '',
+  CONSTRAINT `GroupModel`
+    FOREIGN KEY (`ID_Model` , `ID_Mark`)
+    REFERENCES `auto`.`CarModelsEN` (`ID` , `ID_Mark`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `GroupModel2`
+    FOREIGN KEY (`ID_Group`)
+    REFERENCES `auto`.`CarModelsEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarModelsEN` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Name` VARCHAR(50) NOT NULL COMMENT '',
+  `ID_Type` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Uses` INT(11) NOT NULL DEFAULT 1 COMMENT '',
+  INDEX (`ID` ASC)  COMMENT '',
+  PRIMARY KEY (`ID`, `ID_Mark`)  COMMENT '',
+  INDEX `MarkModeles_idx` (`ID_Mark` ASC)  COMMENT '',
+  INDEX `ModelType_idx` (`ID_Type` ASC)  COMMENT '',
+  CONSTRAINT `MarkModeles`
+    FOREIGN KEY (`ID_Mark`)
+    REFERENCES `auto`.`CarMarksEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `ModelType`
+    FOREIGN KEY (`ID_Type`)
+    REFERENCES `auto`.`ModelTypes` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CarPresenceEN` (
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Model` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Name` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Firm` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `CarYear` VARCHAR(20) NOT NULL COMMENT '',
+  `ID_Body` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Engine` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Comment` VARCHAR(200) NOT NULL COMMENT '',
+  `TechNumber` VARCHAR(100) NOT NULL COMMENT '',
+  `Catalog_Number` VARCHAR(50) NOT NULL COMMENT '',
+  `Cost` DECIMAL(19,4) NULL DEFAULT 0 COMMENT '',
+  INDEX (`ID_Firm` ASC)  COMMENT '',
+  INDEX (`ID_Mark` ASC)  COMMENT '',
+  INDEX (`ID_Model` ASC)  COMMENT '',
+  INDEX (`ID_Name` ASC)  COMMENT '',
+  PRIMARY KEY (`ID_Mark`, `ID_Model`, `ID_Name`, `ID_Firm`, `CarYear`, `ID_Body`, `ID_Engine`, `Comment`, `TechNumber`, `Catalog_Number`)  COMMENT '',
+  INDEX `Engine_idx` (`ID_Engine` ASC, `ID_Mark` ASC)  COMMENT '',
+  INDEX `Body_idx` (`ID_Body` ASC, `ID_Mark` ASC, `ID_Model` ASC)  COMMENT '',
+  CONSTRAINT `ModelMarks`
+    FOREIGN KEY (`ID_Mark` , `ID_Model`)
+    REFERENCES `auto`.`CarModelsEN` (`ID_Mark` , `ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `Firms`
+    FOREIGN KEY (`ID_Firm`)
+    REFERENCES `auto`.`Firms` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `DetailName`
+    FOREIGN KEY (`ID_Name`)
+    REFERENCES `auto`.`CarENDetailNames` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `Engine`
+    FOREIGN KEY (`ID_Engine` , `ID_Mark`)
+    REFERENCES `auto`.`CarEngineModelsEN` (`ID` , `ID_Mark`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `Body`
+    FOREIGN KEY (`ID_Body` , `ID_Mark` , `ID_Model`)
+    REFERENCES `auto`.`CarBodyModelsEN` (`ID` , `ID_Mark` , `ID_Model`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION,
+  CONSTRAINT `Mark`
+    FOREIGN KEY (`ID_Mark`)
+    REFERENCES `auto`.`CarMarksEN` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`CatalogNumbersEN` (
+  `Catalog_Number` VARCHAR(50) NOT NULL COMMENT '',
+  `ID_Mark` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Name` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  PRIMARY KEY (`Catalog_Number`, `ID_Mark`, `ID_Name`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`Firms` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `Name` VARCHAR(75) NOT NULL COMMENT '',
+  `Address` VARCHAR(120) NULL DEFAULT NULL COMMENT '',
+  `Phone` VARCHAR(75) NULL DEFAULT NULL COMMENT '',
+  `Comment` VARCHAR(150) NULL DEFAULT NULL COMMENT '',
+  `Enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '',
+  `ActivityType` VARCHAR(255) NULL DEFAULT NULL COMMENT '',
+  `OrganizationType` VARCHAR(100) NULL DEFAULT NULL COMMENT '',
+  `District` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  `Fax` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  `Email` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  `URL` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  `OperatingMode` VARCHAR(255) NULL DEFAULT NULL COMMENT '',
+  `Identifier` VARCHAR(100) NULL DEFAULT NULL COMMENT '',
+  `Priority` INT(11) NOT NULL DEFAULT 100 COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '',
+  FULLTEXT INDEX `FULLTEXT` (`Name` ASC, `Address` ASC, `Phone` ASC, `Comment` ASC, `ActivityType` ASC, `OrganizationType` ASC, `District` ASC, `Fax` ASC, `Email` ASC, `URL` ASC, `OperatingMode` ASC)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`MarkTypes` (
+  `ID` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Name` VARCHAR(50) NOT NULL COMMENT '',
+  INDEX (`Name` ASC)  COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`ModelTypes` (
+  `ID` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Name` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  INDEX (`Name` ASC)  COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`ServicePresence` (
+  `ID_Service` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `ID_Firm` INT(11) NOT NULL DEFAULT 0 COMMENT '',
+  `Comment` VARCHAR(250) NOT NULL COMMENT '',
+  `CarList` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  `Cost` VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`ID_Service`, `ID_Firm`, `Comment`)  COMMENT '',
+  INDEX `FirmsService_idx` (`ID_Firm` ASC)  COMMENT '',
+  CONSTRAINT `FirmsService`
+    FOREIGN KEY (`ID_Firm`)
+    REFERENCES `auto`.`Firms` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `Service`
+    FOREIGN KEY (`ID_Service`)
+    REFERENCES `auto`.`Services` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auto`.`Services` (
+  `ID` INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+  `Name` VARCHAR(50) NOT NULL COMMENT '',
+  `Comment` VARCHAR(250) NULL DEFAULT NULL COMMENT '',
+  `ID_Parent` INT(11) NULL DEFAULT NULL COMMENT '',
+  PRIMARY KEY (`ID`)  COMMENT '',
+  INDEX (`ID_Parent` ASC)  COMMENT '',
+  CONSTRAINT `Services`
+    FOREIGN KEY (`ID_Parent`)
+    REFERENCES `auto`.`Services` (`ID`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COLLATE = utf8_general_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

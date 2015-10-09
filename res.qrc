@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>icons/statusFalse.png</file>
         <file>icons/statusTrue.png</file>
+        <file>files/create_base.sql</file>
     </qresource>
 </RCC>

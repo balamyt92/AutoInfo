@@ -6,6 +6,7 @@ BaseWizardDialog::BaseWizardDialog(QWidget *parent) :
     ui(new Ui::BaseWizardDialog)
 {
     ui->setupUi(this);
+    ui->textBrowser->hide();
     settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
     this->setWindowTitle("Менеджер базы данных");
     baseType = settings->value("base/type").toString();
@@ -21,7 +22,7 @@ BaseWizardDialog::BaseWizardDialog(QWidget *parent) :
         if(baseType == SERVER)
         {
             model = new QSqlQueryModel(this);
-            model->setQuery("show databases");
+            this->updateBaseList();
             proxyModel = new QSortFilterProxyModel(this);
             proxyModel->setSourceModel(model);
             ui->tableView->setModel(proxyModel);
@@ -60,7 +61,7 @@ BaseWizardDialog::~BaseWizardDialog()
 QString BaseWizardDialog::getSelectBase()
 {
     QModelIndexList index = ui->tableView->selectionModel()->selectedIndexes();
-    if(index[0].isValid())
+    if(!index.isEmpty())
         return index[0].data().toString();
     else
         return "";
@@ -70,10 +71,11 @@ void BaseWizardDialog::on_creatButton_clicked()
 {
     bool ok;
     QString name = QInputDialog::getText(this, tr("Создание базы данных"),
-                                         tr("Имя мазы данных (без пробелов):"),
+                                         tr("Имя базы данных (без пробелов):"),
                                          QLineEdit::Normal, "name", &ok);
     if (ok && !name.isEmpty())
     {
+        this->setDisabled(true);
         QSqlQuery add;
         add.prepare("create database " + name);
         if (!add.exec())
@@ -159,11 +161,37 @@ void BaseWizardDialog::on_creatButton_clicked()
             ui->progressBar->setValue(0);
         }
     }
-    model->setQuery("show databases");
+    this->setDisabled(false);
+    this->updateBaseList();
 }
 
 void BaseWizardDialog::on_deleteButton_clicked()
 {
+    QString selectbase = this->getSelectBase();
+    if(selectbase == "")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Выберите базу!");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setInformativeText("Чтобы удалить базу выберите её из списка слева");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
+    if(selectbase == "mysql" || selectbase == "performance_schema" || selectbase == "information_schema")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Нельза выбрать эту базу!");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setInformativeText("Действи на данной базой запрещены. Она служебканая.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
     QMessageBox msgBox;
     msgBox.setText("<b>Удаление базы!</b>");
     msgBox.setIcon(QMessageBox::Warning);
@@ -174,7 +202,7 @@ void BaseWizardDialog::on_deleteButton_clicked()
     if (ret == QMessageBox::Ok)
     {
         QSqlQuery query;
-        query.prepare("drop database " + this->getSelectBase());
+        query.prepare("drop database " + selectbase);
         if(!query.exec())
         {
             QString err = query.lastError().text();
@@ -184,7 +212,91 @@ void BaseWizardDialog::on_deleteButton_clicked()
         }
         else
         {
-            model->setQuery("show databases");
+            this->updateBaseList();
         }
     }
+}
+
+void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar)
+{
+    BaseImport *import = new BaseImport;
+    QObject::connect(import, SIGNAL(messages(QString)), logger, SLOT(append(QString)));
+    QObject::connect(import, SIGNAL(fail(QString)), logger, SLOT(append(QString)));
+    QObject::connect(import, SIGNAL(setMaxBar(int)), bar, SLOT(setMaximum(int)));
+    QObject::connect(import, SIGNAL(setValueToBar(int)), bar, SLOT(setValue(int)));
+    import->setPathToFiles(path);
+    import->startImport(basename);
+}
+
+void BaseWizardDialog::on_importButton_clicked()
+{
+    QString selectbase = this->getSelectBase();
+    if(selectbase == "")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Выберите базу!");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setInformativeText("Чтобы импортировать данные в базу сначала выберите её из списка слева.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
+    if(selectbase == "mysql" || selectbase == "performance_schema" || selectbase == "information_schema")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Нельза выбрать эту базу!");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setInformativeText("Действи на данной базой запрещены. Она служебканая.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+
+    ui->textBrowser->show();
+
+    QDialog *parent = qobject_cast<QDialog *>(this->parent());
+    QFileDialog dialog(parent);
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setNameFilter("Directories");
+    dialog.setViewMode(QFileDialog::Detail);
+
+    QString path;
+    if (dialog.exec())
+        path = dialog.selectedFiles().isEmpty() ? QString() : dialog.selectedFiles()[0];
+
+    extern void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar);
+    QFuture<void> future = QtConcurrent::run(importToBase, selectbase, path, ui->textBrowser, ui->progressBar);
+
+}
+
+
+void BaseWizardDialog::updateBaseList()
+{
+    model->setQuery("show databases");
+}
+
+void BaseWizardDialog::disabledUi()
+{
+    ui->tableView->setEnabled(false);
+    ui->creatButton->setEnabled(false);
+    ui->deleteButton->setEnabled(false);
+    ui->exportButton->setEnabled(false);
+    ui->importButton->setEnabled(false);
+}
+
+void BaseWizardDialog::enabledUi()
+{
+    ui->tableView->setEnabled(true);
+    ui->creatButton->setEnabled(true);
+    ui->deleteButton->setEnabled(true);
+    ui->exportButton->setEnabled(true);
+    ui->importButton->setEnabled(true);
+}
+
+void BaseWizardDialog::setMsgToLog(QString msg)
+{
+    ui->textBrowser->append(msg);
 }

@@ -2,19 +2,29 @@
 #define BASEWIZARDDIALOG_H
 
 #include <QDialog>
-#include <QString>
+#include <QDebug>
+
 #include <QSqlQueryModel>
 #include <QSortFilterProxyModel>
-#include <QSettings>
-#include <QMessageBox>
+#include <QSqlRecord>
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QDebug>
-#include <QInputDialog>
-#include <QFile>
-#include <QTextStream>
+
+#include <QString>
 #include <QStringList>
+
+#include <QSettings>
+
+#include <QMessageBox>
+#include <QInputDialog>
+
+#include <QThread>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
+#include <QFutureWatcher>
+
 #include "constants.h"
+#include "baseimport.h"
 
 namespace Ui {
 class BaseWizardDialog;
@@ -34,11 +44,22 @@ private:
     QString               baseType;
     QSqlQueryModel        *model;
     QSortFilterProxyModel *proxyModel;
+    QThread               thread;
 
 private slots:
     QString getSelectBase();
     void on_creatButton_clicked();
     void on_deleteButton_clicked();
+    void on_importButton_clicked();
+    void updateBaseList();
+    void disabledUi();
+    void enabledUi();
+
+public slots:
+    void setMsgToLog(QString msg);
+
+signals:
+    void startImport(QString basename);
 };
 
 #endif // BASEWIZARDDIALOG_H

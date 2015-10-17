@@ -86,6 +86,9 @@
      </item>
     </layout>
    </item>
+   <item row="1" column="0">
+    <widget class="QTextBrowser" name="textBrowser"/>
+   </item>
   </layout>
  </widget>
  <resources/>

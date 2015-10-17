@@ -16,13 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     database.cpp \
     settingsdialog.cpp \
-    basewizarddialog.cpp
+    basewizarddialog.cpp \
+    baseimport.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
     settingsdialog.h \
     constants.h \
-    basewizarddialog.h
+    basewizarddialog.h \
+    baseimport.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \

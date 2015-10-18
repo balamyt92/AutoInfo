@@ -217,42 +217,48 @@ void BaseWizardDialog::on_deleteButton_clicked()
     }
 }
 
-void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar)
+void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar, QString basetype)
 {
     BaseImport *import = new BaseImport;
     QObject::connect(import, SIGNAL(messages(QString)), logger, SLOT(append(QString)));
     QObject::connect(import, SIGNAL(fail(QString)), logger, SLOT(append(QString)));
     QObject::connect(import, SIGNAL(setMaxBar(int)), bar, SLOT(setMaximum(int)));
     QObject::connect(import, SIGNAL(setValueToBar(int)), bar, SLOT(setValue(int)));
+    import->setBaseType(basetype);
     import->setPathToFiles(path);
     import->startImport(basename);
 }
 
 void BaseWizardDialog::on_importButton_clicked()
 {
-    QString selectbase = this->getSelectBase();
-    if(selectbase == "")
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Выберите базу!");
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setInformativeText("Чтобы импортировать данные в базу сначала выберите её из списка слева.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
-        return;
-    }
+    QString selectbase = "";
 
-    if(selectbase == "mysql" || selectbase == "performance_schema" || selectbase == "information_schema")
+    if(baseType == SERVER)
     {
-        QMessageBox msgBox;
-        msgBox.setText("Нельза выбрать эту базу!");
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setInformativeText("Действи на данной базой запрещены. Она служебканая.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
-        return;
+        selectbase = this->getSelectBase();
+        if(selectbase == "")
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Выберите базу!");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setInformativeText("Чтобы импортировать данные в базу сначала выберите её из списка слева.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+            return;
+        }
+
+        if(selectbase == "mysql" || selectbase == "performance_schema" || selectbase == "information_schema")
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Нельза выбрать эту базу!");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setInformativeText("Действи на данной базой запрещены. Она служебканая.");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+            return;
+        }
     }
 
     ui->textBrowser->show();
@@ -267,8 +273,8 @@ void BaseWizardDialog::on_importButton_clicked()
     if (dialog.exec())
         path = dialog.selectedFiles().isEmpty() ? QString() : dialog.selectedFiles()[0];
 
-    extern void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar);
-    QFuture<void> future = QtConcurrent::run(importToBase, selectbase, path, ui->textBrowser, ui->progressBar);
+    extern void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar, QString baseType_);
+    QFuture<void> future = QtConcurrent::run(importToBase, selectbase, path, ui->textBrowser, ui->progressBar, baseType);
 
 }
 

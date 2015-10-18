@@ -64,23 +64,30 @@ BaseImport::~BaseImport()
 
 }
 
+void BaseImport::setBaseType(QString baseType_)
+{
+    baseType = baseType_;
+}
+
 void BaseImport::startImport(QString baseName_)
 {
-    baseName = baseName_;
+    if(baseType == SERVER)
+    {
+        baseName = baseName_;
+        if(baseName.isEmpty() || baseName == "mysql"
+                || baseName == "performance_schema"
+                || baseName == "information_schema")
+        {
+            emit fail("ОШИБКА! Не выбрана база для импорта или имя базы не корректно!");
+            return;
+        }
+    }
 
     emit messages("Импорт запущен из " + path);
 
-    if(baseName.isEmpty() || baseName == "mysql"
-                          || baseName == "performance_schema"
-                          || baseName == "information_schema")
-    {
-        emit fail("ОШИБКА! Не выбрана база для импорта или имя базы не корректно!");
-        return;
-    }
-
     emit messages("Начинаю очистку таблиц от старых данных");
     // Таблицы отчищаем в обратном порядке чтобы избажать проблем с ключами
-    for (int i = files.count() - 1; i > 0; --i) {
+    for (int i = files.count() - 1; i >= 0; --i) {
         if(!clearTable(files[i].split(".").first().toLower()))
         {
             emit fail("Не могу очистить таблицу");
@@ -121,8 +128,12 @@ bool BaseImport::importFile(QString fileName, int coulumCount)
     }
 
     QSqlQuery query;
+
     // получаем список столбцов таблицы
-    query.prepare("SHOW columns FROM " + baseName +"."+ fileName.split(".").first().toLower());
+    if(baseType == SERVER)
+        query.prepare("SHOW columns FROM " + baseName +"."+ fileName.split(".").first().toLower());
+    else
+        query.prepare("PRAGMA table_info(" + fileName.split(".").first().toLower() + ")");
     if(!query.exec())
     {
         emit fail("Не могу получить список столбцов таблицы " + fileName.split(".").first().toLower());
@@ -131,17 +142,24 @@ bool BaseImport::importFile(QString fileName, int coulumCount)
     }
 
     QString filds = "(";
-    int i = 0;
+    int id = 0;
+    if(baseType == LOCAL)
+        id = 1;
+
+    bool flag = false;
     while (query.next())
     {
-        if(query.size() - 1 == i)
-            filds += query.value(0).toString();
+        if(flag == false)
+        {
+            filds += query.value(id).toString();
+            flag = true;
+        }
         else
-            filds += query.value(0).toString() + ",";
-        i++;
+            filds += "," + query.value(id).toString();
     }
+
     filds += ") VALUES(";
-    for(;i -1 > 0; --i)
+    for(int i = coulumCount; i - 1 > 0; --i)
     {
         filds += "?,";
     }
@@ -169,7 +187,7 @@ bool BaseImport::importFile(QString fileName, int coulumCount)
 
         if(fileName == "Services.txt")
         {
-             swap << line; // отправляем в свап если файл нужно считать весь и обработать
+            swap << line; // отправляем в свап если файл нужно считать весь и обработать
         }
         else
         {
@@ -192,9 +210,13 @@ bool BaseImport::importFile(QString fileName, int coulumCount)
 
             if(tmp[3].isEmpty())
                 tmp[3] = "NULL";
-            query.prepare("INSERT INTO " + baseName + ".services"
-                          " (ID, Name, ID_Parent) "
-                          "VALUES (" + tmp[0] + ", \'" + tmp[1] + "\'," + tmp[3] +")");
+            if(baseType == SERVER)
+                query.prepare("INSERT INTO " + baseName + ".services"
+                              " (ID, Name, ID_Parent) "
+                              "VALUES (" + tmp[0] + ", \'" + tmp[1] + "\'," + tmp[3] +")");
+            else
+                query.prepare("INSERT INTO services (ID, Name, ID_Parent) "
+                              "VALUES (" + tmp[0] + ", \'" + tmp[1] + "\'," + tmp[3] +")");
             if(!query.exec())
             {
                 emit messages("ОШИБКА: не могу добавить строку в таблицу Service " + query.lastQuery());
@@ -207,17 +229,22 @@ bool BaseImport::importFile(QString fileName, int coulumCount)
 
 bool BaseImport::insertData(QString fileName, QStringList data, QString filds, int count)
 {
-    QSqlQuery insert;
     QString tableName = fileName.split(".").first().toLower();
-    QString sql = "INSERT INTO " + baseName + "." + tableName;
 
+    QString sql;
+    if(baseType == SERVER)
+        sql = "INSERT INTO " + baseName + "." + tableName;
+    else
+        sql = "INSERT INTO "+ tableName;
 
     sql += filds;
+
+    QSqlQuery insert;
     insert.prepare(sql);
 
     for (int i = 0; i < count; ++i)
     {
-       insert.addBindValue(data.takeFirst());
+        insert.addBindValue(data.takeFirst());
     }
 
     if(!insert.exec())
@@ -236,20 +263,28 @@ bool BaseImport::clearTable(QString tableName)
     QSqlQuery query;
     if(tableName == "services")
     {
-        query.prepare("DELETE FROM " + baseName + ".services WHERE ID_Parent != \'\'");
+        if(baseType == SERVER)
+            query.prepare("DELETE FROM " + baseName + ".services WHERE ID_Parent != \'\'");
+        else
+            query.prepare("DELETE FROM services WHERE ID_Parent != \'\'");
         if(!query.exec())
         {
             QString err = "ОШИБКА!! Ну удалось очистить таблицу " + tableName + "\n"
-                        + "Операция прервана!\n" + query.lastError().text();
+                    + "Операция прервана!\n" + query.lastError().text();
             emit messages(err);
             return false;
         }
     }
-    query.prepare("DELETE FROM " + baseName + "." + tableName);
+
+    if(baseType == SERVER)
+        query.prepare("DELETE FROM " + baseName + "." + tableName);
+    else
+        query.prepare("DELETE FROM " + tableName);
+
     if(!query.exec())
     {
         QString err = "ОШИБКА!! Ну удалось очистить таблицу " + tableName + "\n"
-                    + "Операция прервана!\n" + query.lastError().text();
+                + "Операция прервана!\n" + query.lastError().text();
         emit messages(err);
         return false;
     }

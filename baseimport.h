@@ -15,6 +15,8 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
+#include "constants.h"
+
 class BaseImport : public QObject
 {
     Q_OBJECT
@@ -22,6 +24,7 @@ class BaseImport : public QObject
 private:
     QString          path;
     QString          baseName;
+    QString          baseType;
     QList<QString>   files;
     QList<int>       columCount;
 
@@ -40,6 +43,7 @@ signals:
     void setValueToBar(int);
 
 public slots:
+    void setBaseType(QString baseType_);
     void setPathToFiles(QString path_);
     void setBaseName(QString base_);
     void startImport(QString baseName_);

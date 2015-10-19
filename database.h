@@ -7,10 +7,10 @@
 #include <QSqlError>
 #include <QSqlDatabase>
 #include <QFile>
-#include <QSettings>
 #include <QDebug>
 #include <QInputDialog>
 #include <QMessageBox>
+#include "settings.h"
 
 #include "constants.h"
 
@@ -30,7 +30,7 @@ public:
 
 private:
     QString         baseType;
-    QSettings       *settings;
+    Settings        *settings;
     QSqlDatabase    db;
 
     bool openServerBase();

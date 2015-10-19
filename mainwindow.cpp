@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
+    settings = Settings::getInstance();
     this->configUi();
     database.setParent(this);
     database.connectToDataBase();
@@ -26,7 +26,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
     settings->setValue("MainWindows/geometry", this->saveGeometry());
-    settings->sync();
     database.closeDataBase();
 }
 
@@ -61,7 +60,6 @@ void MainWindow::openSettings()
     }
     settings->setValue("SettingsDialog/geometry", sd->saveGeometry());
     delete sd;
-    settings->sync();
 }
 
 void MainWindow::openBaseWizard()

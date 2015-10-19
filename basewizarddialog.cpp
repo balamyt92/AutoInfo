@@ -7,7 +7,7 @@ BaseWizardDialog::BaseWizardDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textBrowser->hide();
-    settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
+    settings = Settings::getInstance();
     this->setWindowTitle("Менеджер базы данных");
     baseType = settings->value("base/type").toString();
     if(baseType == LOCAL)
@@ -55,7 +55,6 @@ BaseWizardDialog::~BaseWizardDialog()
 {
     delete ui;
     settings->setValue("MainWindows/geometry", this->saveGeometry());
-    settings->sync();
 }
 
 QString BaseWizardDialog::getSelectBase()
@@ -69,13 +68,13 @@ QString BaseWizardDialog::getSelectBase()
 
 void BaseWizardDialog::on_creatButton_clicked()
 {
+    this->setDisabled(true);
     bool ok;
     QString name = QInputDialog::getText(this, tr("Создание базы данных"),
                                          tr("Имя базы данных (без пробелов):"),
                                          QLineEdit::Normal, "name", &ok);
     if (ok && !name.isEmpty())
     {
-        this->setDisabled(true);
         QSqlQuery add;
         add.prepare("create database " + name);
         if (!add.exec())
@@ -160,9 +159,9 @@ void BaseWizardDialog::on_creatButton_clicked()
             }
             ui->progressBar->setValue(0);
         }
+        this->updateBaseList();
     }
     this->setDisabled(false);
-    this->updateBaseList();
 }
 
 void BaseWizardDialog::on_deleteButton_clicked()
@@ -253,7 +252,7 @@ void BaseWizardDialog::on_importButton_clicked()
             QMessageBox msgBox;
             msgBox.setText("Нельза выбрать эту базу!");
             msgBox.setIcon(QMessageBox::Information);
-            msgBox.setInformativeText("Действи на данной базой запрещены. Она служебканая.");
+            msgBox.setInformativeText("Действи на данной базой запрещены. Она служебная.");
             msgBox.setStandardButtons(QMessageBox::Ok);
             msgBox.setDefaultButton(QMessageBox::Ok);
             msgBox.exec();
@@ -272,7 +271,6 @@ void BaseWizardDialog::on_importButton_clicked()
     QString path;
     if (dialog.exec())
         path = dialog.selectedFiles().isEmpty() ? QString() : dialog.selectedFiles()[0];
-
     extern void importToBase(QString basename, QString path, QTextBrowser *logger, QProgressBar *bar, QString baseType_);
     QFuture<void> future = QtConcurrent::run(importToBase, selectbase, path, ui->textBrowser, ui->progressBar, baseType);
 

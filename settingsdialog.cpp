@@ -7,7 +7,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Натсройки");
-    settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
+    settings = Settings::getInstance();
     baseType = settings->value("base/type", SERVER).toString();
     if(baseType == SERVER)
     {
@@ -26,6 +26,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
 SettingsDialog::~SettingsDialog()
 {
+    settings->sync();
     delete ui;
 }
 

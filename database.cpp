@@ -2,7 +2,7 @@
 
 DataBase::DataBase(QObject *parent) : QObject(parent)
 {
-    settings = new QSettings(CONFIG_FILE, QSettings::IniFormat);
+    settings = Settings::getInstance();
 }
 
 DataBase::~DataBase()
@@ -31,8 +31,15 @@ void DataBase::connectToDataBase()
                 msgBox.setDefaultButton(QMessageBox::Ok);
                 msgBox.exec();
                 settings->setValue("base/type", LOCAL);
-                settings->sync();
                 this->connectToDataBase();
+            }
+            else
+            {
+                QString baseName = settings->value("server/basename", "").toString();
+                if(!baseName.isEmpty())
+                {
+                    db.setDatabaseName(baseName);
+                }
             }
         }
         else
@@ -67,7 +74,7 @@ QString DataBase::getBaseName()
 {
     QString name;
     if(db.databaseName().isEmpty() || db.databaseName().isNull() || db.databaseName() == " ")
-        name = "NO BASE";
+        name = "<b>NO BASE</b>";
     else
         name = db.databaseName();
     return name;

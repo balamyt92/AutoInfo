@@ -2,14 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSettings>
 #include <QMessageBox>
 #include <QLabel>
 #include <QPixmap>
 #include <QTimer>
+
 #include "database.h"
 #include "settingsdialog.h"
 #include "basewizarddialog.h"
+#include "settings.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,7 +27,7 @@ public:
 private:
     Ui::MainWindow  *ui;
     DataBase        database;
-    QSettings       *settings;
+    Settings        *settings;
     QLabel          statusLine;
     QLabel          statusIcon;
     QTimer          *timer;

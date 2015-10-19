@@ -13,8 +13,6 @@
 #include <QString>
 #include <QStringList>
 
-#include <QSettings>
-
 #include <QMessageBox>
 #include <QInputDialog>
 
@@ -25,6 +23,7 @@
 
 #include "constants.h"
 #include "baseimport.h"
+#include "settings.h"
 
 namespace Ui {
 class BaseWizardDialog;
@@ -40,11 +39,11 @@ public:
 
 private:
     Ui::BaseWizardDialog  *ui;
-    QSettings             *settings;
-    QString               baseType;
+    Settings              *settings;
+    QString                baseType;
     QSqlQueryModel        *model;
     QSortFilterProxyModel *proxyModel;
-    QThread               thread;
+    QThread                thread;
 
 private slots:
     QString getSelectBase();

@@ -2,12 +2,12 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
-#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QMessageBox>
 #include <QInputDialog>
 #include "constants.h"
+#include "settings.h"
 
 namespace Ui {
 class SettingsDialog;
@@ -28,7 +28,7 @@ private slots:
 
 private:
     Ui::SettingsDialog *ui;
-    QSettings          *settings;
+    Settings           *settings;
     QString             baseType;
 };
 

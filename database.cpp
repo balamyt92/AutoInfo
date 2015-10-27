@@ -38,7 +38,9 @@ void DataBase::connectToDataBase()
                 QString baseName = settings->value("server/basename", "").toString();
                 if(!baseName.isEmpty())
                 {
+                    db.close();
                     db.setDatabaseName(baseName);
+                    db.open();
                 }
             }
         }

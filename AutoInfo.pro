@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     settingsdialog.cpp \
     basewizarddialog.cpp \
     baseimport.cpp \
-    settings.cpp
+    settings.cpp \
+    searchresultlist.cpp \
+    firmdialog.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
@@ -26,11 +28,15 @@ HEADERS  += mainwindow.h \
     constants.h \
     basewizarddialog.h \
     baseimport.h \
-    settings.h
+    settings.h \
+    searchresultlist.h \
+    firmdialog.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
-    basewizarddialog.ui
+    basewizarddialog.ui \
+    searchresultlist.ui \
+    firmdialog.ui
 
 RESOURCES += \
     res.qrc

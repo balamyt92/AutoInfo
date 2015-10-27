@@ -70,3 +70,17 @@ void MainWindow::openBaseWizard()
     settings->setValue("BaseWizardDialog/geometry", bwd->saveGeometry());
     delete bwd;
 }
+
+void MainWindow::on_searchButton_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("Поиск по фирмам"), tr("Что ищем:"),
+                                         QLineEdit::Normal, "", &ok);
+    if(ok && !text.isEmpty())
+    {
+        SearchResultList * sr = new SearchResultList(this);
+        sr->setSearch(text);
+        sr->exec();
+        delete sr;
+    }
+}

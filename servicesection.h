@@ -10,7 +10,9 @@
 #include <QMenu>
 #include <QList>
 #include <QAction>
+#include <QMessageBox>
 #include "settings.h"
+#include "servicesearchresult.h"
 
 namespace Ui {
 class ServiceSection;

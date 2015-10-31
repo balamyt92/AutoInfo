@@ -100,7 +100,6 @@ void ServiceSection::addSection()
     }
 }
 
-#include <QMessageBox>
 void ServiceSection::deleteSection()
 {
     QMessageBox msg;
@@ -155,17 +154,28 @@ void ServiceSection::deleteSection()
 
 void ServiceSection::openSection()
 {
-    QModelIndexList index = ui->tableView->selectionModel()->selectedRows();
-    selectedSection = ui->tableView->currentIndex().row();
-    id = index.first().data().toString();
-    model->setFilter("ID_Parent=" + id);
-    if(!model->select())
+    if(!sectionIsOpen)
     {
-        qDebug() << "Error : " + model->lastError().text();
+        QModelIndexList index = ui->tableView->selectionModel()->selectedRows();
+        selectedSection = ui->tableView->currentIndex().row();
+        id = index.first().data().toString();
+        model->setFilter("ID_Parent=" + id);
+        if(!model->select())
+        {
+            qDebug() << "Error : " + model->lastError().text();
+        }
+        sectionIsOpen = true;
+        ui->tableView->selectRow(0);
+        ui->tableView->setFocus();
     }
-    sectionIsOpen = true;
-    ui->tableView->selectRow(0);
-    ui->tableView->setFocus();
+    else
+    {
+        QModelIndexList index = ui->tableView->selectionModel()->selectedRows();
+        ServiceSearchResult *sr = new ServiceSearchResult(this);
+        sr->setServiceId(index.at(0).data().toInt());
+        sr->exec();
+        delete sr;
+    }
 }
 
 void ServiceSection::on_tableView_customContextMenuRequested(const QPoint &pos)
@@ -178,12 +188,6 @@ void ServiceSection::on_tableView_customContextMenuRequested(const QPoint &pos)
     // если от других виджетов
     else
         globalPos = ((QWidget*)sender())->mapToGlobal(pos);
-
-    QAction *a = menu->actions().at(0);
-    if(sectionIsOpen == true)
-        a->setDisabled(true);
-    else
-        a->setEnabled(true);
 
     menu->exec(globalPos);
 }
@@ -209,7 +213,7 @@ void ServiceSection::keyPressEvent(QKeyEvent *event)
         this->backToSections();
         return;
     }
-    if((event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) && sectionIsOpen == false)
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
         this->openSection();
         return;

@@ -46,6 +46,7 @@ void FirmDialog::setModel(QAbstractItemModel *model)
     mapper->addMapping(ui->TextRegim, 12);
     mapper->addMapping(ui->lineIndifer, 13);
     mapper->addMapping(ui->linePriority, 14);
+    mapper->toFirst();
 }
 
 void FirmDialog::setCurrent(QModelIndex &index)

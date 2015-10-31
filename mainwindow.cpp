@@ -79,3 +79,10 @@ void MainWindow::on_searchButton_clicked()
         delete sr;
     }
 }
+
+void MainWindow::on_serviceButton_clicked()
+{
+    ServiceSection *ss = new ServiceSection(this);
+    ss->exec();
+    delete ss;
+}

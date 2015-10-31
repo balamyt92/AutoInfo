@@ -12,6 +12,7 @@
 #include "basewizarddialog.h"
 #include "settings.h"
 #include "searchresultlist.h"
+#include "servicesection.h"
 
 namespace Ui {
 class MainWindow;
@@ -41,6 +42,7 @@ private slots:
     void openSettings();
     void openBaseWizard();
     void on_searchButton_clicked();
+    void on_serviceButton_clicked();
 };
 
 #endif // MAINWINDOW_H

@@ -2,6 +2,8 @@
 #define FIRMDIALOG_H
 
 #include <QDialog>
+#include <QPushButton>
+#include <QKeyEvent>
 #include <QDataWidgetMapper>
 #include "settings.h"
 
@@ -24,6 +26,8 @@ private:
     Ui::FirmDialog *ui;
     QDataWidgetMapper *mapper;
     Settings *settings;
+    QPushButton *canceled;
+    QPushButton *okay;
 };
 
 #endif // FIRMDIALOG_H

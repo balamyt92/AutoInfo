@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     settings = Settings::getInstance();
-    this->configUi();
+    this->setWindowTitle("Автомобильная справочная служба");
+    this->restoreGeometry(settings->value("MainWindows/geometry").toByteArray());
     database.setParent(this);
     database.connectToDataBase();
     timer = new QTimer(this);
@@ -27,12 +28,6 @@ MainWindow::~MainWindow()
     delete ui;
     settings->setValue("MainWindows/geometry", this->saveGeometry());
     database.closeDataBase();
-}
-
-void MainWindow::configUi()
-{
-    this->setWindowTitle("Автомобильная справочная служба");
-    this->restoreGeometry(settings->value("MainWindows/geometry").toByteArray());
 }
 
 void MainWindow::statusCheck()

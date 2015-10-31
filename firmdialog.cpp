@@ -6,6 +6,16 @@ FirmDialog::FirmDialog(QWidget *parent) :
     ui(new Ui::FirmDialog)
 {
     ui->setupUi(this);
+    this->setWindowTitle(tr("Фирма"));
+    okay = new QPushButton(tr("Ok"));
+    canceled = new QPushButton(tr("Отмена"));
+    okay->setAutoDefault(true);
+    canceled->setAutoDefault(true);
+    okay->setDefault(false);
+    canceled->setDefault(true);
+    ui->buttonBox->addButton(okay, QDialogButtonBox::AcceptRole);
+    ui->buttonBox->addButton(canceled, QDialogButtonBox::RejectRole);
+    canceled->setFocus();
 
     mapper = new QDataWidgetMapper;
     settings = Settings::getInstance();
@@ -61,3 +71,6 @@ void FirmDialog::setReadOnly(bool flag)
     ui->lineIndifer->setReadOnly(flag);
     ui->linePriority->setReadOnly(flag);
 }
+
+
+

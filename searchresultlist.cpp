@@ -7,6 +7,7 @@ SearchResultList::SearchResultList(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(Qt::Window);
+    this->setWindowTitle(tr("Результаты поиска"));
     model = new QSqlTableModel(this);
     proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
@@ -27,10 +28,21 @@ SearchResultList::~SearchResultList()
 void SearchResultList::setSearch(QString text)
 {
     model->setTable("firms");
-    model->setFilter("concat(Name,Address,Phone,Comment,ActivityType,OrganizationType,District,Fax,Email,URL,OperatingMode) LIKE '%" + text + "%'");
+    model->setFilter("Name LIKE '%" + text + "%' OR "
+                     "Address LIKE '%" + text + "%' OR "
+                     "Phone LIKE '%" + text + "%' OR "
+                     "Comment LIKE '%" + text + "%' OR "
+                     "ActivityType LIKE '%" + text + "%' OR "
+                     "OrganizationType LIKE '%" + text + "%' OR "
+                     "District LIKE '%" + text + "%' OR "
+                     "Fax LIKE '%" + text + "%' OR "
+                     "Email LIKE '%" + text + "%' OR "
+                     "URL LIKE '%" + text + "%' OR "
+                     "OperatingMode LIKE '%" + text + "%'");
+
     if(!model->select())
     {
-        qDebug() << model->lastError().text();
+        qDebug() << "Error!!!!! :" + model->lastError().text();
         return;
     }
 
@@ -94,7 +106,6 @@ void SearchResultList::openFirm()
     fd->setReadOnly(true);
     fd->exec();
     delete fd;
-
 }
 
 void SearchResultList::keyPressEvent(QKeyEvent *event)

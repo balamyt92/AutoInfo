@@ -34,8 +34,6 @@ private:
     QTimer          *timer;
 
 private slots:
-    // Слот настройки формочки
-    void configUi();
     // слот для таймера проверки статуса
     void statusCheck();
 

@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionSettings,SIGNAL(triggered(bool)),this, SLOT(openSettings()));
     connect(ui->actionBase,SIGNAL(triggered(bool)),this, SLOT(openBaseWizard()));
+    connect(ui->actionServices, SIGNAL(triggered(bool)), this, SLOT(on_serviceButton_clicked()));
 }
 
 MainWindow::~MainWindow()

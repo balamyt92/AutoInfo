@@ -11,6 +11,9 @@
 #include <QList>
 #include <QAction>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QKeyEvent>
+
 #include "settings.h"
 #include "servicesearchresult.h"
 
@@ -42,6 +45,7 @@ private slots:
     void openSection();
     void on_tableView_customContextMenuRequested(const QPoint &pos);
     void backToSections();
+    void editSection();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

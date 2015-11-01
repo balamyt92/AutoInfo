@@ -25,6 +25,7 @@ ServiceSection::ServiceSection(QWidget *parent) :
 
     menu = new QMenu();
     menu->addAction("Содержание...", this, SLOT(openSection()), Qt::Key_Enter);
+    menu->addAction("Изменить...", this, SLOT(editSection()), Qt::CTRL + Qt::Key_U);
     menu->addAction("Добавить...", this, SLOT(addSection()), Qt::CTRL + Qt::Key_A);
     menu->addAction("Удалить...", this, SLOT(deleteSection()), Qt::CTRL + Qt::Key_D);
 
@@ -59,7 +60,6 @@ ServiceSection::~ServiceSection()
     delete ui;
 }
 
-#include <QInputDialog>
 void ServiceSection::addSection()
 {
     bool ok;
@@ -73,7 +73,6 @@ void ServiceSection::addSection()
             qDebug() << "Error!1 : " + model->lastError().text();
             return;
         }
-
         if(sectionIsOpen)
         {
             if(!model->setData(model->index(row, 3), id))
@@ -97,7 +96,8 @@ void ServiceSection::addSection()
             model->revertAll();
             return;
         }
-    }
+        ui->tableView->selectRow(0);
+    }    
 }
 
 void ServiceSection::deleteSection()
@@ -121,7 +121,8 @@ void ServiceSection::deleteSection()
 
     if(ret == QMessageBox::Ok)
     {
-        if(!proxy->removeRow(ui->tableView->currentIndex().row()))
+        int row = ui->tableView->currentIndex().row();
+        if(!proxy->removeRow(row))
         {
             qDebug() << "Error! : " + model->lastError().text();
             qDebug() << "----------------------------------------";
@@ -147,6 +148,10 @@ void ServiceSection::deleteSection()
             msg.exec();
             return;
         }
+        if(row > 1)
+            ui->tableView->selectRow(row - 1);
+        else
+            ui->tableView->selectRow(row);
     }
 
 
@@ -154,9 +159,12 @@ void ServiceSection::deleteSection()
 
 void ServiceSection::openSection()
 {
+    QModelIndexList index = ui->tableView->selectionModel()->selectedRows();
+    if(index.isEmpty())
+        return;
     if(!sectionIsOpen)
     {
-        QModelIndexList index = ui->tableView->selectionModel()->selectedRows();
+
         selectedSection = ui->tableView->currentIndex().row();
         id = index.first().data().toString();
         model->setFilter("ID_Parent=" + id);
@@ -170,7 +178,6 @@ void ServiceSection::openSection()
     }
     else
     {
-        QModelIndexList index = ui->tableView->selectionModel()->selectedRows();
         ServiceSearchResult *sr = new ServiceSearchResult(this);
         sr->setServiceId(index.at(0).data().toInt());
         sr->exec();
@@ -205,7 +212,102 @@ void ServiceSection::backToSections()
     ui->tableView->setFocus();
 }
 
-#include <QKeyEvent>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QLabel>
+#include <QGridLayout>
+#include <QDialogButtonBox>
+#include <QSqlQuery>
+
+void ServiceSection::editSection()
+{
+    QModelIndexList index = ui->tableView->selectionModel()->selectedIndexes();
+    if(index.isEmpty())
+        return;
+    if(sectionIsOpen)
+    {
+
+        QSqlQuery query("SELECT ID, Name FROM services "
+                        "WHERE ID_Parent IS NULL "
+                        "ORDER BY Name ASC ");
+        QStringList id;
+        QStringList name;
+        while (query.next())
+        {
+            id << query.value(0).toString();
+            name << query.value(1).toString();
+        }
+
+        QDialog *edit = new QDialog(this);
+        edit->setWindowTitle("Редактирование услуги");
+        QLabel *sectionName = new QLabel(tr("Раздел"), this);
+        QLabel *nameLable = new QLabel(tr("Наименование"), edit);
+        QLineEdit *line = new QLineEdit(edit);
+        QComboBox *box = new QComboBox(edit);
+        QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok |
+                                                         QDialogButtonBox::Cancel, edit);
+        connect(buttons, SIGNAL(accepted()), edit, SLOT(accept()));
+        connect(buttons, SIGNAL(rejected()), edit, SLOT(reject()));
+
+        QGridLayout *grid = new QGridLayout(edit);
+        grid->addWidget(nameLable, 0, 0, 1, 1);
+        grid->addWidget(sectionName, 1, 0, 1, 1);
+        grid->addWidget(line, 0, 1, 1, 1);
+        grid->addWidget(box, 1, 1, 1, 1);
+        grid->addWidget(buttons, 2, 1, 1, 1);
+        edit->setLayout(grid);
+
+        line->setText(index.at(1).data().toString());
+        box->addItems(name);
+        int i = 0;
+        for(; i < id.count(); ++i)
+        {
+            if(id.at(i).toInt() == index.at(3).data().toInt())
+                break;
+        }
+        box->setCurrentIndex(i);
+
+        if(edit->exec() == QDialog::Accepted)
+        {
+            query.prepare("UPDATE services SET ID_Parent="
+                          + id.at(box->currentIndex()) +
+                          ", Name=\'" + line->text() + "\'"
+                          " WHERE ID=" + index.at(0).data().toString());
+            query.exec();
+            model->select();
+            ui->tableView->setFocus();
+        }
+
+    }
+    else
+    {
+        START:
+        bool ok = false;
+        QString newName = QInputDialog::getText(this, "Введите новое имя раздела",
+                                                "Новое имя", QLineEdit::Normal,
+                                                index.at(1).data().toString(), &ok);
+        if(ok)
+        {
+            if(newName.isEmpty())
+            {
+                QMessageBox::critical(this, "Ошибка", "Имя не может быть пустым", QMessageBox::Ok);
+                goto START;
+            }
+
+            if(!proxy->setData(index.at(1),newName))
+            {
+                QMessageBox::critical(this, "Ошибка", "Недопустимое имя", QMessageBox::Ok);
+                goto START;
+            }
+            if(!model->submitAll())
+            {
+                QMessageBox::critical(this, "Ошибка", "Недопустимое имя", QMessageBox::Ok);
+                goto START;
+            }
+        }
+    }
+}
+
 void ServiceSection::keyPressEvent(QKeyEvent *event)
 {
     if(sectionIsOpen == true && event->key() == Qt::Key_Escape)

@@ -14,6 +14,13 @@
 #include <QInputDialog>
 #include <QKeyEvent>
 
+#include <QLineEdit>
+#include <QComboBox>
+#include <QLabel>
+#include <QGridLayout>
+#include <QDialogButtonBox>
+#include <QSqlQuery>
+
 #include "settings.h"
 #include "servicesearchresult.h"
 

@@ -13,6 +13,7 @@
 #include "settings.h"
 #include "searchresultlist.h"
 #include "servicesection.h"
+#include "filterdialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,6 +34,7 @@ private:
     QLabel          statusLine;
     QLabel          statusIcon;
     QTimer          *timer;
+    FilterDialog    *filterDialog;
 
 private slots:
     // слот для таймера проверки статуса
@@ -43,6 +45,7 @@ private slots:
     void openBaseWizard();
     void on_searchButton_clicked();
     void on_serviceButton_clicked();
+    void on_filterButton_clicked();
 };
 
 #endif // MAINWINDOW_H

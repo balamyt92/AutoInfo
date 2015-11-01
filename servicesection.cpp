@@ -212,13 +212,6 @@ void ServiceSection::backToSections()
     ui->tableView->setFocus();
 }
 
-#include <QLineEdit>
-#include <QComboBox>
-#include <QLabel>
-#include <QGridLayout>
-#include <QDialogButtonBox>
-#include <QSqlQuery>
-
 void ServiceSection::editSection()
 {
     QModelIndexList index = ui->tableView->selectionModel()->selectedIndexes();

@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->statusCheck();
     ui->statusBar->addWidget(&statusIcon);
     ui->statusBar->addWidget(&statusLine);
-
+    filterDialog = new FilterDialog(this);
 
     connect(ui->actionSettings,SIGNAL(triggered(bool)),this, SLOT(openSettings()));
     connect(ui->actionBase,SIGNAL(triggered(bool)),this, SLOT(openBaseWizard()));
@@ -86,4 +86,9 @@ void MainWindow::on_serviceButton_clicked()
     ServiceSection *ss = new ServiceSection(this);
     ss->exec();
     delete ss;
+}
+
+void MainWindow::on_filterButton_clicked()
+{
+    filterDialog->exec();
 }

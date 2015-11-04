@@ -122,7 +122,24 @@ void ServiceSection::deleteSection()
     if(ret == QMessageBox::Ok)
     {
         int row = ui->tableView->currentIndex().row();
-        if(!proxy->removeRow(row))
+
+        if(sectionIsOpen == false)
+        {
+            QString id_parent = ui->tableView->selectionModel()->selectedRows(0).at(0).data().toString();
+            qDebug() << id_parent;
+            QSqlQuery query("SELECT Name FROM services WHERE ID_Parent=" + id_parent);
+            if(query.next())
+            {
+                msg.setIcon(QMessageBox::Critical);
+                msg.setText("Не могу удалить!");
+                msg.setInformativeText("Есть вложенные услуги!");
+                msg.setStandardButtons(QMessageBox::Ok);
+                msg.exec();
+                return;
+            }
+        }
+
+        if(!proxy->removeRow(row) || !proxy->submit())
         {
             qDebug() << "Error! : " + model->lastError().text();
             qDebug() << "----------------------------------------";
@@ -135,6 +152,7 @@ void ServiceSection::deleteSection()
             msg.exec();
             return;
         }
+
         if(!model->submitAll())
         {
             qDebug() << "Error! : " + model->lastError().text();
@@ -148,6 +166,7 @@ void ServiceSection::deleteSection()
             msg.exec();
             return;
         }
+
         if(row > 1)
             ui->tableView->selectRow(row - 1);
         else

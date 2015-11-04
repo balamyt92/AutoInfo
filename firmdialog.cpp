@@ -17,7 +17,7 @@ FirmDialog::FirmDialog(QWidget *parent) :
     ui->buttonBox->addButton(canceled, QDialogButtonBox::RejectRole);
     canceled->setFocus();
 
-    mapper = new QDataWidgetMapper;
+    mapper = new QDataWidgetMapper(this);
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("firmDialog/geometry").toByteArray());
 }

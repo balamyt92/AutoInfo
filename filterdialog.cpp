@@ -1,8 +1,6 @@
 #include "filterdialog.h"
 #include "ui_filterdialog.h"
 
-#include <QSortFilterProxyModel>
-
 FilterDialog::FilterDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FilterDialog)
@@ -22,7 +20,7 @@ FilterDialog::FilterDialog(QWidget *parent) :
     }
     query.prepare("SELECT ID, Name FROM carendetailnames ORDER BY Name ASC");
     query.exec();
-    qDebug() << query.lastError().text();
+
     while (query.next())
     {
         id_detail << query.value(0).toString();
@@ -38,22 +36,6 @@ FilterDialog::FilterDialog(QWidget *parent) :
 
     connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setModeles()));
     connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setEngines()));
-
-    ui->markBox->setEditable(true);
-    mark = new QCompleter(name_mark, this);
-    ui->markBox->setCompleter(mark);
-    mark->setCaseSensitivity(Qt::CaseInsensitive);
-    mark->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-
-    ui->detailBox->setEditable(true);
-    detail = new QCompleter(name_detail, this);
-    ui->detailBox->setCompleter(detail);
-    detail->setCaseSensitivity(Qt::CaseInsensitive);
-    detail->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-
-    ui->modelBox->setEditable(true);
-    ui->bodyBox->setEditable(true);
-    ui->engineBox->setEditable(true);
 }
 
 FilterDialog::~FilterDialog()
@@ -61,16 +43,11 @@ FilterDialog::~FilterDialog()
     delete ui;
 }
 
-#include <QSqlQueryModel>
-#include <QTableView>
-#include <QGridLayout>
-
 void FilterDialog::on_searchButton_clicked()
 {
     // уходим если не соблюден минимальный набор данных
     if(ui->markBox->currentIndex() == -1 || ui->detailBox->currentIndex() == -1)
         return;
-
 
     QString where;
     QSqlQuery query("SELECT ID FROM carmarksen WHERE Name LIKE \'***\'");
@@ -205,10 +182,6 @@ void FilterDialog::on_searchButton_clicked()
                      "ON carpresenceen.ID_Engine=carenginemodelsen.ID "
                      "WHERE "+ where);
 
-
-    qDebug() << result->query().lastQuery();
-    qDebug() << result->lastError().text();
-
     QDialog *d = new QDialog(this);
     QTableView *v = new QTableView(d);
     v->setModel(result);
@@ -252,12 +225,6 @@ void FilterDialog::setModeles()
     ui->modelBox->addItems(name_model);
     ui->modelBox->setCurrentIndex(-1);
 
-    delete model;
-    model = new QCompleter(name_model, this);
-    ui->modelBox->setCompleter(model);
-    model->setCaseSensitivity(Qt::CaseInsensitive);
-    model->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-
     connect(ui->modelBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setBodys()));
     connect(ui->bodyBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setEngines()));
 }
@@ -290,12 +257,6 @@ void FilterDialog::setBodys()
     ui->bodyBox->addItems(name_body);
     ui->bodyBox->setCurrentIndex(-1);
     ui->bodyBox->setEnabled(true);
-
-    delete body;
-    body = new QCompleter(name_body, this);
-    ui->bodyBox->setCompleter(body);
-    body->setCaseSensitivity(Qt::CaseInsensitive);
-    body->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 }
 
 void FilterDialog::setEngines()
@@ -349,10 +310,5 @@ void FilterDialog::setEngines()
     ui->engineBox->addItems(name_engine);
     ui->engineBox->setCurrentIndex(-1);
     ui->engineBox->setEnabled(true);
-
-    delete engine;
-    engine = new QCompleter(name_engine, this);
-    ui->engineBox->setCompleter(engine);
-    engine->setCaseSensitivity(Qt::CaseInsensitive);
-    engine->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 }
+

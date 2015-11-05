@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     firmdialog.cpp \
     servicesection.cpp \
     servicesearchresult.cpp \
-    filterdialog.cpp
+    filterdialog.cpp \
+    detaillist.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     firmdialog.h \
     servicesection.h \
     servicesearchresult.h \
-    filterdialog.h
+    filterdialog.h \
+    detaillist.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
@@ -45,7 +47,8 @@ FORMS    += mainwindow.ui \
     firmdialog.ui \
     servicesection.ui \
     servicesearchresult.ui \
-    filterdialog.ui
+    filterdialog.ui \
+    detaillist.ui
 
 RESOURCES += \
     res.qrc

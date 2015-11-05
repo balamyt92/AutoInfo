@@ -126,13 +126,26 @@ void ServiceSection::deleteSection()
         if(sectionIsOpen == false)
         {
             QString id_parent = ui->tableView->selectionModel()->selectedRows(0).at(0).data().toString();
-            qDebug() << id_parent;
             QSqlQuery query("SELECT Name FROM services WHERE ID_Parent=" + id_parent);
             if(query.next())
             {
                 msg.setIcon(QMessageBox::Critical);
                 msg.setText("Не могу удалить!");
                 msg.setInformativeText("Есть вложенные услуги!");
+                msg.setStandardButtons(QMessageBox::Ok);
+                msg.exec();
+                return;
+            }
+        }
+        else
+        {
+            QString id_parent = ui->tableView->selectionModel()->selectedRows(0).at(0).data().toString();
+            QSqlQuery query("SELECT ID_Firm FROM servicepresence WHERE ID_Service=" + id_parent);
+            if(query.next())
+            {
+                msg.setIcon(QMessageBox::Critical);
+                msg.setText("Не могу удалить!");
+                msg.setInformativeText("Данная услуга есть в фирмах!");
                 msg.setStandardButtons(QMessageBox::Ok);
                 msg.exec();
                 return;

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "detaillist.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -22,13 +23,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSettings,SIGNAL(triggered(bool)),this, SLOT(openSettings()));
     connect(ui->actionBase,SIGNAL(triggered(bool)),this, SLOT(openBaseWizard()));
     connect(ui->actionServices, SIGNAL(triggered(bool)), this, SLOT(on_serviceButton_clicked()));
+    connect(ui->actionDetails, SIGNAL(triggered(bool)), this, SLOT(openDetail()));
+
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
     settings->setValue("MainWindows/geometry", this->saveGeometry());
     database.closeDataBase();
+    delete ui;
 }
 
 void MainWindow::statusCheck()
@@ -65,6 +68,13 @@ void MainWindow::openBaseWizard()
     bwd->exec();
     settings->setValue("BaseWizardDialog/geometry", bwd->saveGeometry());
     delete bwd;
+}
+
+void MainWindow::openDetail()
+{
+    DetailList *dl = new DetailList(this);
+    dl->exec();
+    delete dl;
 }
 
 void MainWindow::on_searchButton_clicked()

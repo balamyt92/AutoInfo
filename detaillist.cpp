@@ -149,7 +149,7 @@ void DetailList::addDetail()
         }
 
         QString item = QInputDialog::getItem(this, tr("Выберите связанную деталь"), tr("Деталь"),
-                                             &name, 0, false, &ok);
+                                             name, 0, false, &ok);
         if(ok && !item.isEmpty())
         {
             int i = 0;

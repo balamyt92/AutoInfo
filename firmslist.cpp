@@ -20,10 +20,11 @@ FirmsList::FirmsList(QWidget *parent) :
         model->fetchMore();
     }
 
-    proxy = new QSortFilterProxyModel(this);
+    proxy = new FirmProxyModel(this);
     proxy->setSourceModel(model);
     proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
     proxy->setFilterKeyColumn(-1);
+    proxy->setSortCaseSensitivity(Qt::CaseInsensitive);
 
     menu = new QMenu();
     menu->addAction("Прайс...", this, SLOT(openPrice()), Qt::Key_Enter);
@@ -178,7 +179,23 @@ void FirmsList::deleteFirm()
 
 }
 
+#include "firmdialog.h"
 void FirmsList::editFirm()
 {
+    QModelIndex index = ui->tableView->selectionModel()->selectedIndexes().first();
+    if(!index.isValid())
+        return;
 
+    index = proxy->mapToSource(index);
+
+    FirmDialog *fd = new FirmDialog(this);
+    fd->setModel(model);
+    fd->setCurrent(index);
+    fd->exec();
+    delete fd;
+
+    model->submitAll();
+    while (model->canFetchMore()) {
+        model->fetchMore();
+    }
 }

@@ -14,6 +14,7 @@
 #include <QKeyEvent>
 
 #include "settings.h"
+#include "firmproxymodel.h"
 
 namespace Ui {
 class FirmsList;
@@ -41,7 +42,7 @@ private slots:
 private:
     Ui::FirmsList           *ui;
     QSqlTableModel          *model;
-    QSortFilterProxyModel   *proxy;
+    FirmProxyModel          *proxy;
     QMenu                   *menu;
     Settings                *settings;
 

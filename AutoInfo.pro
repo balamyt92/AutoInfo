@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     servicesearchresult.cpp \
     filterdialog.cpp \
     detaillist.cpp \
-    firmslist.cpp
+    firmslist.cpp \
+    firmproxymodel.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     servicesearchresult.h \
     filterdialog.h \
     detaillist.h \
-    firmslist.h
+    firmslist.h \
+    firmproxymodel.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \

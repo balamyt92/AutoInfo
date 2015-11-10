@@ -157,14 +157,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label_14">
+      <widget class="QCheckBox" name="checkBox">
        <property name="text">
-        <string>Включен в поиск</string>
+        <string>В поиске</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBox"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">

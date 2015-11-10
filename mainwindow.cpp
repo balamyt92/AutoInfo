@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionBase,SIGNAL(triggered(bool)),this, SLOT(openBaseWizard()));
     connect(ui->actionServices, SIGNAL(triggered(bool)), this, SLOT(on_serviceButton_clicked()));
     connect(ui->actionDetails, SIGNAL(triggered(bool)), this, SLOT(openDetail()));
+    connect(ui->actionFirms, SIGNAL(triggered(bool)), this, SLOT(openFirms()));
 
 }
 
@@ -101,4 +102,12 @@ void MainWindow::on_serviceButton_clicked()
 void MainWindow::on_filterButton_clicked()
 {
     filterDialog->exec();
+}
+
+void MainWindow::openFirms()
+{
+    FirmsList *fl = new FirmsList(this);
+    fl->exec();
+
+    delete fl;
 }

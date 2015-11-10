@@ -14,6 +14,7 @@
 #include "searchresultlist.h"
 #include "servicesection.h"
 #include "filterdialog.h"
+#include "firmslist.h"
 
 namespace Ui {
 class MainWindow;
@@ -47,6 +48,7 @@ private slots:
     void on_searchButton_clicked();
     void on_serviceButton_clicked();
     void on_filterButton_clicked();
+    void openFirms();
 };
 
 #endif // MAINWINDOW_H

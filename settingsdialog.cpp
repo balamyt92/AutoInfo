@@ -6,7 +6,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-    this->setWindowTitle("Натсройки");
+    this->setWindowTitle("Настройки");
     settings = Settings::getInstance();
     baseType = settings->value("base/type", SERVER).toString();
     if(baseType == SERVER)
@@ -16,11 +16,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         ui->userEdit->setText(settings->value("server/username", "root").toString());
         ui->passwordEdit->setText(settings->value("server/password", "data").toString());
         ui->portEdit->setText(settings->value("server/port","3306").toString());
+        ui->groupBox_2->setEnabled(false);
     }
     if(baseType == LOCAL)
     {
         ui->comboBox->setCurrentIndex(1);
         ui->groupBox->setEnabled(false);
+        ui->pathEdit->setText(settings->value("localbase/basePath", "base.sqlite").toString());
     }
 }
 
@@ -43,8 +45,8 @@ void SettingsDialog::on_buttonBox_accepted()
     else
     {
         settings->setValue("localbase/hostname", "localhost");
-        settings->setValue("localbase/basename", LOCAL_BASE_NAME);
         settings->setValue("base/type", LOCAL);
+        settings->setValue("localbase/basePath", ui->pathEdit->text());
     }
     settings->sync();
 }
@@ -54,13 +56,30 @@ void SettingsDialog::on_comboBox_currentIndexChanged(int index)
     if(index)
     {
         ui->groupBox->setEnabled(false);
+        ui->groupBox_2->setEnabled(true);
     }
     else
     {
         ui->groupBox->setEnabled(true);
+        ui->groupBox_2->setEnabled(false);
         ui->hostEdit->setText(settings->value("server/hostname", "localhost").toString());
         ui->userEdit->setText(settings->value("server/username", "root").toString());
         ui->passwordEdit->setText(settings->value("server/password", "data").toString());
         ui->portEdit->setText(settings->value("server/port","3306").toString());
     }
+}
+
+#include <QFileDialog>
+void SettingsDialog::on_pathButton_clicked()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter("base (*.sqlite *.db)");
+    dialog.setViewMode(QFileDialog::Detail);
+
+    QString path;
+    if (dialog.exec())
+        path = dialog.selectedFiles().isEmpty() ? QString() : dialog.selectedFiles()[0];
+
+    ui->pathEdit->setText(path);
 }

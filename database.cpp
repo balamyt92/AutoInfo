@@ -123,7 +123,7 @@ bool DataBase::openServerBase()
 
 bool DataBase::openLocalBase()
 {
-    if(!QFile(LOCAL_BASE_NAME).exists())
+    if(!QFile(settings->value("localbase/basePath", "base.sqlite").toString()).exists())
     {
         qDebug() << tr("Ошибка соеднеиния! Нет файла базы!");
         return false;
@@ -132,7 +132,7 @@ bool DataBase::openLocalBase()
     {
         db = QSqlDatabase::addDatabase("QSQLITE");
         db.setHostName(settings->value("localbase/hostname", "localhost").toString());
-        db.setDatabaseName(settings->value("localbase/basename", LOCAL_BASE_NAME).toString());
+        db.setDatabaseName(settings->value("localbase/basePath", "base.sqlite").toString());
         if(db.open())
         {
             qDebug() << tr("Соедниение с локальной базой установлено!");

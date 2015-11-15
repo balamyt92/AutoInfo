@@ -13,6 +13,7 @@ BaseWizardDialog::BaseWizardDialog(QWidget *parent) :
     if(baseType == LOCAL)
     {
         ui->tableView->setEnabled(false);
+        ui->tableView->hide();
         ui->creatButton->setEnabled(false);
         ui->deleteButton->setEnabled(false);
         ui->label->setText("РАБОТА С ЛОКАЛЬНОЙ БАЗОЙ");
@@ -33,7 +34,6 @@ BaseWizardDialog::BaseWizardDialog(QWidget *parent) :
             ui->tableView->setSortingEnabled(true);
             ui->tableView->horizontalHeader()->setStretchLastSection(true);
             ui->tableView->verticalHeader()->hide();
-
         }
         else
         {

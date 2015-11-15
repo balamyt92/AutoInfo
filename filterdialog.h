@@ -30,6 +30,9 @@ private slots:
     void setBodys();
     void setEngines();
 
+public slots:
+    void selectBeginData();
+
 private:
     Ui::FilterDialog    *ui;
 

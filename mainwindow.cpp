@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "detaillist.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,7 +18,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->statusCheck();
     ui->statusBar->addWidget(&statusIcon);
     ui->statusBar->addWidget(&statusLine);
+
     filterDialog = new FilterDialog(this);
+    this->setCentralWidget(filterDialog);
+    connect(&database, SIGNAL(reconnectBase()), filterDialog, SLOT(selectBeginData()));
+
+    serviceDialog = new ServiceSection(this);
+    connect(&database, SIGNAL(reconnectBase()), serviceDialog, SLOT(selectData()));
+    serviceDialog->show();
 
     connect(ui->actionSettings,SIGNAL(triggered(bool)),this, SLOT(openSettings()));
     connect(ui->actionBase,SIGNAL(triggered(bool)),this, SLOT(openBaseWizard()));
@@ -26,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionDetails, SIGNAL(triggered(bool)), this, SLOT(openDetail()));
     connect(ui->actionFirms, SIGNAL(triggered(bool)), this, SLOT(openFirms()));
 
+    searchDialog = new SearchForm(this);
+    searchDialog->show();
 }
 
 MainWindow::~MainWindow()
@@ -33,6 +42,16 @@ MainWindow::~MainWindow()
     settings->setValue("MainWindows/geometry", this->saveGeometry());
     database.closeDataBase();
     delete ui;
+}
+
+void MainWindow::activateServiceWindows()
+{
+    serviceDialog->activateWindow();
+}
+
+void MainWindow::activateSearchWindows()
+{
+    searchDialog->activateWindow();
 }
 
 void MainWindow::statusCheck()
@@ -110,4 +129,22 @@ void MainWindow::openFirms()
     fl->exec();
 
     delete fl;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *e)
+{
+
+    if(e->key() == Qt::Key_F1)
+    {
+        searchDialog->activateWindow();
+    }
+    if(e->key() == Qt::Key_F2)
+    {
+        this->activateWindow();
+    }
+    if(e->key() == Qt::Key_F3)
+    {
+        serviceDialog->activateWindow();
+    }
+    QMainWindow::keyPressEvent(e);
 }

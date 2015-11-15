@@ -41,6 +41,7 @@ void DataBase::connectToDataBase()
                     db.close();
                     db.setDatabaseName(baseName);
                     db.open();
+                    emit reconnectBase();
                 }
             }
         }
@@ -112,6 +113,7 @@ bool DataBase::openServerBase()
     if(db.open())
     {
         qDebug() << tr("Соедниение с сервером установлено!");
+        emit reconnectBase();
         return true;
     }
     else
@@ -136,6 +138,7 @@ bool DataBase::openLocalBase()
         if(db.open())
         {
             qDebug() << tr("Соедниение с локальной базой установлено!");
+            emit reconnectBase();
             return true;
         }
         else

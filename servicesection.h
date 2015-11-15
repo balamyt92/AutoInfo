@@ -54,6 +54,9 @@ private slots:
     void backToSections();
     void editSection();
 
+public slots:
+    void selectData();
+
 protected:
     void keyPressEvent(QKeyEvent *event);
 };

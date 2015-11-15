@@ -6,19 +6,13 @@ ServiceSection::ServiceSection(QWidget *parent) :
     ui(new Ui::ServiceSection)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Window);
+    this->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::CustomizeWindowHint);
     this->setWindowTitle(tr("Услуги"));
     model = new QSqlTableModel(this);
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable("services");
-    model->setFilter("ID_Parent IS NULL");
-    if(!model->select())
-    {
-        qDebug() << "Error : " + model->lastError().text();
-        return;
-    }
+    this->selectData();
 
-    sectionIsOpen = false;
 
     proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
@@ -326,13 +320,26 @@ void ServiceSection::editSection()
             }
             if(!model->submitAll())
             {
-                QMessageBox::critical(this, "Ошибка", "Недопустимое имя", QMessageBox::Ok);
+                QMessageBox::critical(this, "Ошибка", model->lastError().text(), QMessageBox::Ok);
                 goto START;
             }
         }
     }
 }
 
+void ServiceSection::selectData()
+{
+    model->setFilter("ID_Parent IS NULL");
+    if(!model->select())
+    {
+        qDebug() << "Error : " + model->lastError().text();
+        qDebug() << model->query().executedQuery();
+        return;
+    }
+    sectionIsOpen = false;
+}
+
+#include "mainwindow.h"
 void ServiceSection::keyPressEvent(QKeyEvent *event)
 {
     if(sectionIsOpen == true && event->key() == Qt::Key_Escape)
@@ -344,6 +351,17 @@ void ServiceSection::keyPressEvent(QKeyEvent *event)
     {
         this->openSection();
         return;
+    }
+
+    if(event->key() == Qt::Key_F3 || event->key() == Qt::Key_F2)
+    {
+        this->parentWidget()->activateWindow();
+    }
+
+    if(event->key() == Qt::Key_F1)
+    {
+        MainWindow *mainw = qobject_cast<MainWindow*>(this->parent());
+        mainw->activateSearchWindows();
     }
 
     QDialog::keyPressEvent(event);

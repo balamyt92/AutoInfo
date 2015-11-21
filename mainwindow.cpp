@@ -10,8 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
     settings = Settings::getInstance();
     this->setWindowTitle("Автомобильная справочная служба");
     this->restoreGeometry(settings->value("MainWindows/geometry").toByteArray());
+
     database.setParent(this);
     database.connectToDataBase();
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(statusCheck()));
     timer->start(1000);
@@ -35,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     searchDialog = new SearchForm(this);
     searchDialog->show();
+
 }
 
 MainWindow::~MainWindow()

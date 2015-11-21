@@ -9,8 +9,8 @@ ServiceSection::ServiceSection(QWidget *parent) :
     this->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::CustomizeWindowHint);
     this->setWindowTitle(tr("Услуги"));
     model = new QSqlTableModel(this);
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable("services");
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     this->selectData();
 
 
@@ -227,6 +227,7 @@ void ServiceSection::on_tableView_customContextMenuRequested(const QPoint &pos)
 
 void ServiceSection::backToSections()
 {
+    model->setTable("services");
     model->setFilter("ID_Parent IS NULL");
     if(!model->select())
     {

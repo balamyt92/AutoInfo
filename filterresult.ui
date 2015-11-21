@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ServiceSection</class>
- <widget class="QWidget" name="ServiceSection">
+ <class>FilterResult</class>
+ <widget class="QDialog" name="FilterResult">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>431</height>
+    <width>808</width>
+    <height>491</height>
    </rect>
   </property>
   <property name="windowTitle">

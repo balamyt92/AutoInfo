@@ -37,6 +37,7 @@ private:
     bool openLocalBase();
 
 signals:
+    void reconnectBase();
 
 public slots:
 };

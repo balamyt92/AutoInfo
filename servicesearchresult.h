@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <QSqlError>
-#include <QSqlRelationalTableModel>
-#include <QSortFilterProxyModel>
+#include <QSqlQueryModel>
+#include <QSqlTableModel>
 #include <QString>
 #include <QMenu>
 #include <QEvent>
@@ -31,8 +31,7 @@ private slots:
 
 private:
     Ui::ServiceSearchResult     *ui;
-    QSqlRelationalTableModel    *model;
-    QSortFilterProxyModel       *proxy;
+    QSqlQueryModel              *model;
     Settings                    *settings;
     QMenu                       *menu;
 

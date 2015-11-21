@@ -1,22 +1,21 @@
 #ifndef FILTERDIALOG_H
 #define FILTERDIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <QStringList>
 #include <QSqlQueryModel>
-#include <QTableView>
-#include <QGridLayout>
 
 #include <QSortFilterProxyModel>
+#include "filterresult.h"
 
 namespace Ui {
 class FilterDialog;
 }
 
-class FilterDialog : public QDialog
+class FilterDialog : public QWidget
 {
     Q_OBJECT
 
@@ -29,6 +28,9 @@ private slots:
     void setModeles();
     void setBodys();
     void setEngines();
+
+public slots:
+    void selectBeginData();
 
 private:
     Ui::FilterDialog    *ui;
@@ -47,6 +49,10 @@ private:
 
     QStringList         id_detail;
     QStringList         name_detail;
+
+    // QWidget interface
+protected:
+    void keyPressEvent(QKeyEvent *e);
 };
 
 #endif // FILTERDIALOG_H

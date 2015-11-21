@@ -41,6 +41,7 @@ void DataBase::connectToDataBase()
                     db.close();
                     db.setDatabaseName(baseName);
                     db.open();
+                    emit reconnectBase();
                 }
             }
         }
@@ -123,7 +124,7 @@ bool DataBase::openServerBase()
 
 bool DataBase::openLocalBase()
 {
-    if(!QFile(LOCAL_BASE_NAME).exists())
+    if(!QFile(settings->value("localbase/basePath", "base.sqlite").toString()).exists())
     {
         qDebug() << tr("Ошибка соеднеиния! Нет файла базы!");
         return false;
@@ -132,10 +133,11 @@ bool DataBase::openLocalBase()
     {
         db = QSqlDatabase::addDatabase("QSQLITE");
         db.setHostName(settings->value("localbase/hostname", "localhost").toString());
-        db.setDatabaseName(settings->value("localbase/basename", LOCAL_BASE_NAME).toString());
+        db.setDatabaseName(settings->value("localbase/basePath", "base.sqlite").toString());
         if(db.open())
         {
             qDebug() << tr("Соедниение с локальной базой установлено!");
+            emit reconnectBase();
             return true;
         }
         else
@@ -161,16 +163,31 @@ void DataBase::selectBase()
         baselist << sql.value(0).toString();
     }
     bool ok;
-    QString base = QInputDialog::getItem(qobject_cast<QWidget *>(this), tr("Выберите базу данных"), tr("Выберите базу"), baselist, 0, true, &ok);
+    QString base = QInputDialog::getItem(qobject_cast<QWidget *>(this), tr("Выберите базу данных"),
+                                         tr("Выберите базу"), baselist, 0, true, &ok);
     if(ok && !base.isEmpty())
     {
+        db.close();
         db.setDatabaseName(base);
+        if(!db.open()) {
+            QMessageBox::warning(qobject_cast<QWidget *>(this),tr("Предупреждение"),
+                                 tr("Произошла ошибка соедиенеиня ") + db.lastError().text(),
+                                 QMessageBox::Ok, QMessageBox::Ok);
+            this->closeDataBase();
+            return;
+        }
+
         settings->setValue("server/basename", base);
         settings->sync();
+        emit reconnectBase();
+
     }
     else
     {
-        QMessageBox::warning(qobject_cast<QWidget *>(this),tr("Предупреждение"), tr("Вы не выбрали базу данных! Соединение будет разорванно!"), QMessageBox::Ok, QMessageBox::Ok);
+        QMessageBox::warning(qobject_cast<QWidget *>(this),tr("Предупреждение"),
+                             tr("Вы не выбрали базу данных! Соединение будет разорванно!"),
+                             QMessageBox::Ok, QMessageBox::Ok);
+        this->closeDataBase();
     }
 }
 

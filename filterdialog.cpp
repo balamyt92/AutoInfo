@@ -2,40 +2,18 @@
 #include "ui_filterdialog.h"
 
 FilterDialog::FilterDialog(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::FilterDialog)
 {
     ui->setupUi(this);
-
     this->setWindowTitle("Поиск запчастей");
     ui->modelBox->setDisabled(true);
     ui->bodyBox->setDisabled(true);
     ui->engineBox->setDisabled(true);
-
-    QSqlQuery query("SELECT ID, Name FROM carmarksen ORDER BY Name ASC");
-    while (query.next())
-    {
-        id_mark << query.value(0).toString();
-        name_mark << query.value(1).toString();
-    }
-    query.prepare("SELECT ID, Name FROM carendetailnames ORDER BY Name ASC");
-    query.exec();
-
-    while (query.next())
-    {
-        id_detail << query.value(0).toString();
-        name_detail << query.value(1).toString();
-    }
-
+    this->selectBeginData();
     ui->markBox->setFocus();
-    ui->markBox->addItems(name_mark);
-    ui->markBox->setCurrentIndex(-1);
-
-    ui->detailBox->addItems(name_detail);
-    ui->detailBox->setCurrentIndex(-1);
-
-    connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setModeles()));
-    connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setEngines()));
+    ui->searchButton->setDefault(true);
+    ui->searchButton->setAutoDefault(true);
 }
 
 FilterDialog::~FilterDialog()
@@ -46,7 +24,7 @@ FilterDialog::~FilterDialog()
 void FilterDialog::on_searchButton_clicked()
 {
     // уходим если не соблюден минимальный набор данных
-    if(ui->markBox->currentIndex() == -1 || ui->detailBox->currentIndex() == -1)
+    if(ui->markBox->currentIndex() == -1)
         return;
 
     QString where;
@@ -54,27 +32,31 @@ void FilterDialog::on_searchButton_clicked()
     query.next();
     // нам нужны помимо выбранной марки еще и три звезды которые обозначают любую марку
     where = "(carpresenceen.ID_Mark=" + id_mark.at(ui->markBox->currentIndex()) +
-            " OR carpresenceen.ID_Mark="+ query.value(0).toString() +") AND (";
+            " OR carpresenceen.ID_Mark="+ query.value(0).toString() +")";
 
-
-    // смотрим с какими деталями связана выбранная, они нам так же нужны в запросе
-    query.prepare("SELECT ID_LinkedDetail FROM carenlinkeddetailnames WHERE ID_GroupDetail="
-                  + id_detail.at(ui->detailBox->currentIndex()));
-    query.exec();
-
-    where += "carpresenceen.ID_Name=" + id_detail.at(ui->detailBox->currentIndex());
-    if(query.isValid())
+    // указана ли деталь
+    if(ui->detailBox->currentIndex() != -1)
     {
-        while (query.next())
-        {
-            where += " OR carpresenceen.ID_Name=" + query.value(0).toString();
-        }
-    }
+        where += " AND (";
+        // смотрим с какими деталями связана выбранная, они нам так же нужны в запросе
+        query.prepare("SELECT ID_LinkedDetail FROM carenlinkeddetailnames WHERE ID_GroupDetail="
+                      + id_detail.at(ui->detailBox->currentIndex()));
+        query.exec();
 
+        where += "carpresenceen.ID_Name=" + id_detail.at(ui->detailBox->currentIndex());
+        if(query.isValid())
+        {
+            while (query.next())
+            {
+                where += " OR carpresenceen.ID_Name=" + query.value(0).toString();
+            }
+        }
+        where += ")";
+    }
     // указана ли модель в фильтре
     if(ui->modelBox->currentIndex() != -1)
     {
-        where += ") AND (";
+        where += " AND (";
 
         // проверяем являеться ли модель группой моделей
         QString model_id = id_model.at(ui->modelBox->currentIndex());
@@ -99,13 +81,13 @@ void FilterDialog::on_searchButton_clicked()
         {
             where += " OR carpresenceen.ID_Model=" + query.value(0).toString();
         }
-
+        where += ")";
     }
 
     // указан ли кузов в фильтре
     if(ui->bodyBox->currentIndex() != -1)
     {
-        where += ") AND (";
+        where += " AND (";
 
         // проверяем являеться ли кузов группой кузовов
         QString body_id = id_body.at(ui->bodyBox->currentIndex());
@@ -131,12 +113,13 @@ void FilterDialog::on_searchButton_clicked()
         {
             where += " OR carpresenceen.ID_Body=" + query.value(0).toString();
         }
+        where += ")";
     }
 
     // указан ли двигатель в фильтре
     if(ui->engineBox->currentIndex() != -1)
     {
-        where += ") AND (";
+        where += " AND (";
 
         // проверяем являеться ли двигатель группой кузовов
         QString engine_id = id_engine.at(ui->engineBox->currentIndex());
@@ -161,37 +144,35 @@ void FilterDialog::on_searchButton_clicked()
         {
             where += " OR carpresenceen.ID_Engine=" + query.value(0).toString();
         }
+        where += ")";
     }
 
-    where += ")";
-
-
     QSqlQueryModel *result = new QSqlQueryModel(this);
-    result->setQuery("SELECT carpresenceen.ID_Firm, carmarksen.Name,"
+    result->setQuery("SELECT carpresenceen.ID_Firm, firms.Priority, carmarksen.Name, "
                      "carmodelsen.Name, carbodymodelsen.Name, carenginemodelsen.Name,"
-                     "carpresenceen.Comment, carpresenceen.TechNumber,"
-                     "carpresenceen.Catalog_Number, carpresenceen.Cost "
+                     "carendetailnames.Name, carpresenceen.Comment, carpresenceen.Cost, "
+                     "carpresenceen.TechNumber, carpresenceen.Catalog_Number "
                      "FROM carpresenceen "
+                     "LEFT JOIN firms "
+                     "ON carpresenceen.ID_Firm=firms.ID "
                      "LEFT JOIN carmarksen "
                      "ON carpresenceen.ID_Mark=carmarksen.ID "
+                     "LEFT JOIN carendetailnames "
+                     "ON carpresenceen.ID_Name=carendetailnames.ID "
                      "LEFT JOIN carmodelsen "
                      "ON carpresenceen.ID_Model=carmodelsen.ID "
                      "LEFT JOIN carbodymodelsen "
                      "ON carpresenceen.ID_Body=carbodymodelsen.ID "
                      "LEFT JOIN carenginemodelsen "
                      "ON carpresenceen.ID_Engine=carenginemodelsen.ID "
-                     "WHERE "+ where);
+                     "WHERE "+ where + "ORDER BY firms.Priority, carpresenceen.ID_Firm, carendetailnames.Name");
 
-    QDialog *d = new QDialog(this);
-    QTableView *v = new QTableView(d);
-    v->setModel(result);
-    QGridLayout *grid = new QGridLayout(d);
-    grid->addWidget(v,0,0,0,0);
-    d->setLayout(grid);
-    d->setWindowFlags(Qt::Window);
-    d->exec();
-    delete d;
+    qDebug() << where;
 
+    FilterResult *resultWindows = new FilterResult(this);
+    resultWindows->setModel(result);
+    resultWindows->exec();
+    delete resultWindows;
 }
 
 void FilterDialog::setModeles()
@@ -310,5 +291,74 @@ void FilterDialog::setEngines()
     ui->engineBox->addItems(name_engine);
     ui->engineBox->setCurrentIndex(-1);
     ui->engineBox->setEnabled(true);
+}
+
+#include <QDebug>
+
+void FilterDialog::selectBeginData()
+{
+    disconnect(ui->markBox, SIGNAL(currentIndexChanged(int)), 0, 0);
+    disconnect(ui->markBox, SIGNAL(currentIndexChanged(int)), 0, 0);
+
+    ui->bodyBox->setEnabled(false);
+    ui->engineBox->setEnabled(false);
+    ui->modelBox->setEnabled(false);
+
+    ui->markBox->setCurrentIndex(-1);
+    ui->markBox->clear();
+    ui->detailBox->setCurrentIndex(-1);
+    ui->detailBox->clear();
+    ui->bodyBox->setCurrentIndex(-1);
+    ui->bodyBox->clear();
+    ui->engineBox->setCurrentIndex(-1);
+    ui->engineBox->clear();
+    ui->modelBox->setCurrentIndex(-1);
+    ui->modelBox->clear();
+
+    id_mark.clear();
+    id_detail.clear();
+    id_body.clear();
+    id_engine.clear();
+    id_model.clear();
+
+    name_mark.clear();
+    name_detail.clear();
+    name_body.clear();
+    name_engine.clear();
+    name_model.clear();
+
+
+    QSqlQuery query("SELECT ID, Name FROM carmarksen ORDER BY Name ASC");
+    while (query.next())
+    {
+        id_mark << query.value(0).toString();
+        name_mark << query.value(1).toString();
+    }
+    query.prepare("SELECT ID, Name FROM carendetailnames ORDER BY Name ASC");
+    query.exec();
+
+    while (query.next())
+    {
+        id_detail << query.value(0).toString();
+        name_detail << query.value(1).toString();
+    }
+
+    ui->markBox->addItems(name_mark);
+    ui->markBox->setCurrentIndex(-1);
+
+    ui->detailBox->addItems(name_detail);
+    ui->detailBox->setCurrentIndex(-1);
+
+    connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setModeles()));
+    connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setEngines()));
+}
+
+void FilterDialog::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+        this->on_searchButton_clicked();
+    }
+
+    QWidget::keyPressEvent(e);
 }
 

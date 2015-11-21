@@ -24,15 +24,20 @@ FilterDialog::~FilterDialog()
 void FilterDialog::on_searchButton_clicked()
 {
     // уходим если не соблюден минимальный набор данных
-    if(ui->markBox->currentIndex() == -1)
+    if(ui->markBox->currentIndex() == -1 && ui->lineNumber->text().isEmpty())
         return;
 
     QString where;
-    QSqlQuery query("SELECT ID FROM carmarksen WHERE Name LIKE \'***\'");
+
+    QSqlQuery query;
+    if(ui->markBox->currentIndex() != -1) {
+    query.prepare("SELECT ID FROM carmarksen WHERE Name LIKE \'***\'");
+    query.exec();
     query.next();
     // нам нужны помимо выбранной марки еще и три звезды которые обозначают любую марку
     where = "(carpresenceen.ID_Mark=" + id_mark.at(ui->markBox->currentIndex()) +
             " OR carpresenceen.ID_Mark="+ query.value(0).toString() +")";
+    }
 
     // указана ли деталь
     if(ui->detailBox->currentIndex() != -1)
@@ -147,6 +152,14 @@ void FilterDialog::on_searchButton_clicked()
         where += ")";
     }
 
+    if(!ui->lineNumber->text().isEmpty())
+    {
+        if(ui->markBox->currentIndex() != -1) {
+            where += " AND ";
+        }
+        where += "carpresenceen.Catalog_Number LIKE '%" + ui->lineNumber->text() + "%' ";
+    }
+
     QSqlQueryModel *result = new QSqlQueryModel(this);
     result->setQuery("SELECT carpresenceen.ID_Firm, firms.Priority, carmarksen.Name, "
                      "carmodelsen.Name, carbodymodelsen.Name, carenginemodelsen.Name,"
@@ -167,6 +180,17 @@ void FilterDialog::on_searchButton_clicked()
                      "ON carpresenceen.ID_Engine=carenginemodelsen.ID "
                      "WHERE "+ where + "ORDER BY firms.Priority, carpresenceen.ID_Firm, carendetailnames.Name");
 
+    result->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    result->setHeaderData(1, Qt::Horizontal, tr("Приоритет"));
+    result->setHeaderData(2, Qt::Horizontal, tr("Марка"));
+    result->setHeaderData(3, Qt::Horizontal, tr("Модель"));
+    result->setHeaderData(4, Qt::Horizontal, tr("Кузов"));
+    result->setHeaderData(5, Qt::Horizontal, tr("Двигатель"));
+    result->setHeaderData(6, Qt::Horizontal, tr("Деталь"));
+    result->setHeaderData(7, Qt::Horizontal, tr("Коментарий"));
+    result->setHeaderData(8, Qt::Horizontal, tr("Цена"));
+    result->setHeaderData(9, Qt::Horizontal, tr("Фото"));
+    result->setHeaderData(10, Qt::Horizontal, tr("Каталожный номер"));
     qDebug() << where;
 
     FilterResult *resultWindows = new FilterResult(this);

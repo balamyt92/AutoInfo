@@ -30,12 +30,34 @@ FilterResult::FilterResult(QWidget *parent) :
 FilterResult::~FilterResult()
 {
     settings->setValue("filterResult/geometry", this->saveGeometry());
+    settings->setValue("filterResult/column_0", ui->tableView->columnWidth(0));
+    settings->setValue("filterResult/column_1", ui->tableView->columnWidth(1));
+    settings->setValue("filterResult/column_2", ui->tableView->columnWidth(2));
+    settings->setValue("filterResult/column_3", ui->tableView->columnWidth(3));
+    settings->setValue("filterResult/column_4", ui->tableView->columnWidth(4));
+    settings->setValue("filterResult/column_5", ui->tableView->columnWidth(5));
+    settings->setValue("filterResult/column_6", ui->tableView->columnWidth(6));
+    settings->setValue("filterResult/column_7", ui->tableView->columnWidth(7));
+    settings->setValue("filterResult/column_8", ui->tableView->columnWidth(8));
+    settings->setValue("filterResult/column_9", ui->tableView->columnWidth(9));
     delete ui;
 }
 
 void FilterResult::setModel(QAbstractItemModel *model)
 {
     ui->tableView->setModel(model);
+    ui->tableView->setColumnWidth(0, settings->value("filterResult/column_0", 100).toInt());
+    ui->tableView->setColumnWidth(1, settings->value("filterResult/column_1", 100).toInt());
+    ui->tableView->setColumnWidth(2, settings->value("filterResult/column_2", 100).toInt());
+    ui->tableView->setColumnWidth(3, settings->value("filterResult/column_3", 100).toInt());
+    ui->tableView->setColumnWidth(4, settings->value("filterResult/column_4", 100).toInt());
+    ui->tableView->setColumnWidth(5, settings->value("filterResult/column_5", 100).toInt());
+    ui->tableView->setColumnWidth(6, settings->value("filterResult/column_6", 100).toInt());
+    ui->tableView->setColumnWidth(7, settings->value("filterResult/column_7", 100).toInt());
+    ui->tableView->setColumnWidth(8, settings->value("filterResult/column_8", 100).toInt());
+    ui->tableView->setColumnWidth(9, settings->value("filterResult/column_9", 100).toInt());
+    ui->tableView->resizeRowsToContents();
+    ui->tableView->selectRow(0);
 }
 
 void FilterResult::on_tableView_customContextMenuRequested(const QPoint &pos)

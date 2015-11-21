@@ -11,6 +11,7 @@ SearchForm::SearchForm(QWidget *parent) :
     this->setWindowTitle("Поиск");
     this->restoreGeometry(settings->value("searchForm/geometry").toByteArray());
     this->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::CustomizeWindowHint);
+    ui->lineEdit->setFocus();
 }
 
 SearchForm::~SearchForm()
@@ -27,6 +28,7 @@ void SearchForm::on_pushButton_clicked()
         sr->setSearch(ui->lineEdit->text().replace("  ", " "));
         sr->exec();
         delete sr;
+        ui->lineEdit->selectAll();
     }
 }
 

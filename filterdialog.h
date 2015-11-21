@@ -1,22 +1,21 @@
 #ifndef FILTERDIALOG_H
 #define FILTERDIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 #include <QStringList>
 #include <QSqlQueryModel>
-#include <QTableView>
-#include <QGridLayout>
 
 #include <QSortFilterProxyModel>
+#include "filterresult.h"
 
 namespace Ui {
 class FilterDialog;
 }
 
-class FilterDialog : public QDialog
+class FilterDialog : public QWidget
 {
     Q_OBJECT
 

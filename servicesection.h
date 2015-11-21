@@ -1,7 +1,7 @@
 #ifndef SERVICESECTION_H
 #define SERVICESECTION_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QString>
 #include <QSqlTableModel>
 #include <QSortFilterProxyModel>
@@ -28,7 +28,7 @@ namespace Ui {
 class ServiceSection;
 }
 
-class ServiceSection : public QDialog
+class ServiceSection : public QWidget
 {
     Q_OBJECT
 

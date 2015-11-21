@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     detaillist.cpp \
     firmslist.cpp \
     firmproxymodel.cpp \
-    searchform.cpp
+    searchform.cpp \
+    filterresult.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
@@ -44,7 +45,8 @@ HEADERS  += mainwindow.h \
     detaillist.h \
     firmslist.h \
     firmproxymodel.h \
-    searchform.h
+    searchform.h \
+    filterresult.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
@@ -56,7 +58,8 @@ FORMS    += mainwindow.ui \
     filterdialog.ui \
     detaillist.ui \
     firmslist.ui \
-    searchform.ui
+    searchform.ui \
+    filterresult.ui
 
 RESOURCES += \
     res.qrc

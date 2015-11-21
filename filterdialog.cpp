@@ -2,11 +2,10 @@
 #include "ui_filterdialog.h"
 
 FilterDialog::FilterDialog(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::FilterDialog)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Widget);
     this->setWindowTitle("Поиск запчастей");
     ui->modelBox->setDisabled(true);
     ui->bodyBox->setDisabled(true);
@@ -149,10 +148,10 @@ void FilterDialog::on_searchButton_clicked()
     }
 
     QSqlQueryModel *result = new QSqlQueryModel(this);
-    result->setQuery("SELECT carpresenceen.ID_Firm, firms.Priority, carmarksen.Name, carendetailnames.Name,"
+    result->setQuery("SELECT carpresenceen.ID_Firm, firms.Priority, carmarksen.Name, "
                      "carmodelsen.Name, carbodymodelsen.Name, carenginemodelsen.Name,"
-                     "carpresenceen.Comment, carpresenceen.TechNumber,"
-                     "carpresenceen.Catalog_Number, carpresenceen.Cost "
+                     "carendetailnames.Name, carpresenceen.Comment, carpresenceen.Cost, "
+                     "carpresenceen.TechNumber, carpresenceen.Catalog_Number "
                      "FROM carpresenceen "
                      "LEFT JOIN firms "
                      "ON carpresenceen.ID_Firm=firms.ID "
@@ -166,20 +165,14 @@ void FilterDialog::on_searchButton_clicked()
                      "ON carpresenceen.ID_Body=carbodymodelsen.ID "
                      "LEFT JOIN carenginemodelsen "
                      "ON carpresenceen.ID_Engine=carenginemodelsen.ID "
-                     "WHERE "+ where + "ORDER BY firms.Priority, carpresenceen.ID_Firm");
+                     "WHERE "+ where + "ORDER BY firms.Priority, carpresenceen.ID_Firm, carendetailnames.Name");
 
     qDebug() << where;
 
-    QDialog *d = new QDialog(this);
-    QTableView *v = new QTableView(d);
-    v->setModel(result);
-    QGridLayout *grid = new QGridLayout(d);
-    grid->addWidget(v,0,0,0,0);
-    d->setLayout(grid);
-    d->setWindowFlags(Qt::Window);
-    d->exec();
-    delete d;
-
+    FilterResult *resultWindows = new FilterResult(this);
+    resultWindows->setModel(result);
+    resultWindows->exec();
+    delete resultWindows;
 }
 
 void FilterDialog::setModeles()

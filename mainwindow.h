@@ -52,9 +52,6 @@ private slots:
     void openSettings();
     void openBaseWizard();
     void openDetail();
-    void on_searchButton_clicked();
-    void on_serviceButton_clicked();
-    void on_filterButton_clicked();
     void openFirms();
 
 protected:

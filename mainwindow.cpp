@@ -100,32 +100,6 @@ void MainWindow::openDetail()
     delete dl;
 }
 
-void MainWindow::on_searchButton_clicked()
-{
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("Поиск по фирмам"), tr("Что ищем:"),
-                                         QLineEdit::Normal, "", &ok);
-    if(ok && !text.isEmpty())
-    {
-        SearchResultList * sr = new SearchResultList(this);
-        sr->setSearch(text);
-        sr->exec();
-        delete sr;
-    }
-}
-
-void MainWindow::on_serviceButton_clicked()
-{
-    ServiceSection *ss = new ServiceSection(this);
-    ss->exec();
-    delete ss;
-}
-
-void MainWindow::on_filterButton_clicked()
-{
-    filterDialog->exec();
-}
-
 void MainWindow::openFirms()
 {
     FirmsList *fl = new FirmsList(this);

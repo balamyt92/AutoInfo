@@ -2,7 +2,7 @@
 #include "ui_servicesection.h"
 
 ServiceSection::ServiceSection(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::ServiceSection)
 {
     ui->setupUi(this);
@@ -365,5 +365,5 @@ void ServiceSection::keyPressEvent(QKeyEvent *event)
         mainw->activateSearchWindows();
     }
 
-    QDialog::keyPressEvent(event);
+    QWidget::keyPressEvent(event);
 }

@@ -8,11 +8,7 @@ ServiceSearchResult::ServiceSearchResult(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowFlags(Qt::Window);
     this->setWindowTitle(tr("Услуги"));
-    model = new QSqlRelationalTableModel(this);
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-
-    proxy = new QSortFilterProxyModel(this);
-    proxy->setSourceModel(model);
+    model = new QSqlQueryModel(this);
 
     menu = new QMenu();
     menu->addAction("О фирме...", this, SLOT(openFirm()), Qt::Key_Enter);
@@ -20,19 +16,15 @@ ServiceSearchResult::ServiceSearchResult(QWidget *parent) :
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("serviceSearchResultDialog/geometry").toByteArray());
 
-
-
-    ui->tableView->setModel(proxy);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    ui->tableView->setSortingEnabled(true);
+    ui->tableView->setSortingEnabled(false);
     ui->tableView->sortByColumn(1, Qt::AscendingOrder);
 
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->verticalHeader()->hide();
 }
 
 ServiceSearchResult::~ServiceSearchResult()
@@ -43,20 +35,15 @@ ServiceSearchResult::~ServiceSearchResult()
 
 void ServiceSearchResult::setServiceId(int id_service)
 {
-    model->setJoinMode(QSqlRelationalTableModel::LeftJoin);
+    model->setQuery("SELECT firms.Priority, servicepresence.ID_Firm, firms.Name, "
+                    "firms.Address, firms.District, servicepresence.Comment, servicepresence.CarList, servicepresence.Cost "
+                    "FROM servicepresence "
+                    "LEFT JOIN firms "
+                    "ON servicepresence.ID_Firm=firms.ID "
+                    "WHERE firms.Enabled=1 AND ID_Service=" + QString::number(id_service) + " "
+                    "ORDER BY firms.Priority, servicepresence.ID_Firm, firms.Name");
+    ui->tableView->setModel(model);
 
-    model->setTable("servicepresence");
-    model->setFilter("ID_Service=" + QString::number(id_service) + " AND Enabled=1");
-    model->setRelation(1, QSqlRelation("firms", "ID", "ID, Name, Address, Phone, Enabled"));
-    if(!model->select())
-    {
-        qDebug() << "Error! : " + model->lastError().text();
-        qDebug() << "--------------------------------------";
-    }
-
-    ui->tableView->hideColumn(0);
-    ui->tableView->hideColumn(1);
-    ui->tableView->hideColumn(5);
     ui->tableView->selectRow(0);
     ui->tableView->setFocus();
     ui->tableView->resizeColumnsToContents();

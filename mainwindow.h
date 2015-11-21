@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QTimer>
+#include <QKeyEvent>
 
 #include "database.h"
 #include "settingsdialog.h"
@@ -13,6 +14,10 @@
 #include "settings.h"
 #include "searchresultlist.h"
 #include "servicesection.h"
+#include "filterdialog.h"
+#include "firmslist.h"
+#include "detaillist.h"
+#include "searchform.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +30,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void activateServiceWindows();
+    void activateSearchWindows();
 
 private:
     Ui::MainWindow  *ui;
@@ -33,6 +40,9 @@ private:
     QLabel          statusLine;
     QLabel          statusIcon;
     QTimer          *timer;
+    FilterDialog    *filterDialog;
+    ServiceSection  *serviceDialog;
+    SearchForm      *searchDialog;
 
 private slots:
     // слот для таймера проверки статуса
@@ -41,8 +51,11 @@ private slots:
     // пункты меню
     void openSettings();
     void openBaseWizard();
-    void on_searchButton_clicked();
-    void on_serviceButton_clicked();
+    void openDetail();
+    void openFirms();
+
+protected:
+    void keyPressEvent(QKeyEvent *e);
 };
 
 #endif // MAINWINDOW_H

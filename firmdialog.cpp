@@ -17,7 +17,7 @@ FirmDialog::FirmDialog(QWidget *parent) :
     ui->buttonBox->addButton(canceled, QDialogButtonBox::RejectRole);
     canceled->setFocus();
 
-    mapper = new QDataWidgetMapper;
+    mapper = new QDataWidgetMapper(this);
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("firmDialog/geometry").toByteArray());
 }
@@ -36,7 +36,7 @@ void FirmDialog::setModel(QAbstractItemModel *model)
     mapper->addMapping(ui->lineAdres, 2);
     mapper->addMapping(ui->linePhone, 3);
     mapper->addMapping(ui->TextPrim, 4);
-    mapper->addMapping(ui->comboBox, 5);
+    mapper->addMapping(ui->checkBox, 5);
     mapper->addMapping(ui->TextProf, 6);
     mapper->addMapping(ui->lineOrgName, 7);
     mapper->addMapping(ui->lineRaion, 8);
@@ -54,6 +54,11 @@ void FirmDialog::setCurrent(QModelIndex &index)
     mapper->setCurrentModelIndex(index);
 }
 
+void FirmDialog::setCurrent(int index)
+{
+    mapper->setCurrentIndex(index);
+}
+
 void FirmDialog::setReadOnly(bool flag)
 {
     ui->lineID->setReadOnly(flag);
@@ -61,7 +66,7 @@ void FirmDialog::setReadOnly(bool flag)
     ui->lineAdres->setReadOnly(flag);
     ui->linePhone->setReadOnly(flag);
     ui->TextPrim->setReadOnly(flag);
-    ui->comboBox->setDisabled(flag);
+    ui->checkBox->setDisabled(flag);
     ui->TextProf->setReadOnly(flag);
     ui->lineOrgName->setReadOnly(flag);
     ui->lineRaion->setReadOnly(flag);

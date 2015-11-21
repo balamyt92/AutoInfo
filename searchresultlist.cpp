@@ -17,6 +17,7 @@ SearchResultList::SearchResultList(QWidget *parent) :
     menu->addAction("Подрбнее", this, SLOT(openFirm()), Qt::Key_Enter);
 
     this->restoreGeometry(settings->value("searchDialog/geometry").toByteArray());
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openFirm()));
 }
 
 SearchResultList::~SearchResultList()
@@ -28,17 +29,45 @@ SearchResultList::~SearchResultList()
 void SearchResultList::setSearch(QString text)
 {
     model->setTable("firms");
-    model->setFilter("Name LIKE '%" + text + "%' OR "
-                     "Address LIKE '%" + text + "%' OR "
-                     "Phone LIKE '%" + text + "%' OR "
-                     "Comment LIKE '%" + text + "%' OR "
-                     "ActivityType LIKE '%" + text + "%' OR "
-                     "OrganizationType LIKE '%" + text + "%' OR "
-                     "District LIKE '%" + text + "%' OR "
-                     "Fax LIKE '%" + text + "%' OR "
-                     "Email LIKE '%" + text + "%' OR "
-                     "URL LIKE '%" + text + "%' OR "
-                     "OperatingMode LIKE '%" + text + "%'");
+    QStringList tmp = text.split(" ");
+    if(tmp.count() > 1) {
+        model->setFilter("(Name LIKE '%" + tmp.first() + "%' OR "
+                         "Address LIKE '%" + tmp.first() + "%' OR "
+                         "Phone LIKE '%" + tmp.first() + "%' OR "
+                         "Comment LIKE '%" + tmp.first() + "%' OR "
+                         "ActivityType LIKE '%" + tmp.first() + "%' OR "
+                         "OrganizationType LIKE '%" + tmp.first() + "%' OR "
+                         "District LIKE '%" + tmp.first() + "%' OR "
+                         "Fax LIKE '%" + tmp.first() + "%' OR "
+                         "Email LIKE '%" + tmp.first() + "%' OR "
+                         "URL LIKE '%" + tmp.first() + "%' OR "
+                         "OperatingMode LIKE '%" + tmp.first() + "%') AND "
+                         "(Name LIKE '%" + tmp.at(1) + "%' OR "
+                          "Address LIKE '%" + tmp.at(1) + "%' OR "
+                          "Phone LIKE '%" + tmp.at(1) + "%' OR "
+                          "Comment LIKE '%" + tmp.at(1) + "%' OR "
+                          "ActivityType LIKE '%" + tmp.at(1) + "%' OR "
+                          "OrganizationType LIKE '%" + tmp.at(1) + "%' OR "
+                          "District LIKE '%" + tmp.at(1) + "%' OR "
+                          "Fax LIKE '%" + tmp.at(1) + "%' OR "
+                          "Email LIKE '%" + tmp.at(1) + "%' OR "
+                          "URL LIKE '%" + tmp.at(1) + "%' OR "
+                          "OperatingMode LIKE '%" + tmp.at(1) + "%')");
+    }
+    else
+    {
+        model->setFilter("Name LIKE '%" + text + "%' OR "
+                         "Address LIKE '%" + text + "%' OR "
+                         "Phone LIKE '%" + text + "%' OR "
+                         "Comment LIKE '%" + text + "%' OR "
+                         "ActivityType LIKE '%" + text + "%' OR "
+                         "OrganizationType LIKE '%" + text + "%' OR "
+                         "District LIKE '%" + text + "%' OR "
+                         "Fax LIKE '%" + text + "%' OR "
+                         "Email LIKE '%" + text + "%' OR "
+                         "URL LIKE '%" + text + "%' OR "
+                         "OperatingMode LIKE '%" + text + "%'");
+    }
 
     if(!model->select())
     {

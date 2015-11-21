@@ -1,7 +1,7 @@
 #ifndef SERVICESECTION_H
 #define SERVICESECTION_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QString>
 #include <QSqlTableModel>
 #include <QSortFilterProxyModel>
@@ -14,6 +14,13 @@
 #include <QInputDialog>
 #include <QKeyEvent>
 
+#include <QLineEdit>
+#include <QComboBox>
+#include <QLabel>
+#include <QGridLayout>
+#include <QDialogButtonBox>
+#include <QSqlQuery>
+
 #include "settings.h"
 #include "servicesearchresult.h"
 
@@ -21,7 +28,7 @@ namespace Ui {
 class ServiceSection;
 }
 
-class ServiceSection : public QDialog
+class ServiceSection : public QWidget
 {
     Q_OBJECT
 
@@ -46,6 +53,9 @@ private slots:
     void on_tableView_customContextMenuRequested(const QPoint &pos);
     void backToSections();
     void editSection();
+
+public slots:
+    void selectData();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

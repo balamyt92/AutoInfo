@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +22,13 @@ SOURCES += main.cpp\
     searchresultlist.cpp \
     firmdialog.cpp \
     servicesection.cpp \
-    servicesearchresult.cpp
+    servicesearchresult.cpp \
+    filterdialog.cpp \
+    detaillist.cpp \
+    firmslist.cpp \
+    firmproxymodel.cpp \
+    searchform.cpp \
+    filterresult.cpp
 
 HEADERS  += mainwindow.h \
     database.h \
@@ -34,7 +40,13 @@ HEADERS  += mainwindow.h \
     searchresultlist.h \
     firmdialog.h \
     servicesection.h \
-    servicesearchresult.h
+    servicesearchresult.h \
+    filterdialog.h \
+    detaillist.h \
+    firmslist.h \
+    firmproxymodel.h \
+    searchform.h \
+    filterresult.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui \
@@ -42,7 +54,12 @@ FORMS    += mainwindow.ui \
     searchresultlist.ui \
     firmdialog.ui \
     servicesection.ui \
-    servicesearchresult.ui
+    servicesearchresult.ui \
+    filterdialog.ui \
+    detaillist.ui \
+    firmslist.ui \
+    searchform.ui \
+    filterresult.ui
 
 RESOURCES += \
     res.qrc

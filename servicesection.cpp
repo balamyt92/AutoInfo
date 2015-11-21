@@ -2,23 +2,17 @@
 #include "ui_servicesection.h"
 
 ServiceSection::ServiceSection(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::ServiceSection)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Window);
+    this->setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::CustomizeWindowHint);
     this->setWindowTitle(tr("Услуги"));
     model = new QSqlTableModel(this);
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable("services");
-    model->setFilter("ID_Parent IS NULL");
-    if(!model->select())
-    {
-        qDebug() << "Error : " + model->lastError().text();
-        return;
-    }
+    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    this->selectData();
 
-    sectionIsOpen = false;
 
     proxy = new QSortFilterProxyModel(this);
     proxy->setSourceModel(model);
@@ -28,6 +22,7 @@ ServiceSection::ServiceSection(QWidget *parent) :
     menu->addAction("Изменить...", this, SLOT(editSection()), Qt::CTRL + Qt::Key_U);
     menu->addAction("Добавить...", this, SLOT(addSection()), Qt::CTRL + Qt::Key_A);
     menu->addAction("Удалить...", this, SLOT(deleteSection()), Qt::CTRL + Qt::Key_D);
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openSection()));
 
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("serviceSectionDialog/geometry").toByteArray());
@@ -122,7 +117,37 @@ void ServiceSection::deleteSection()
     if(ret == QMessageBox::Ok)
     {
         int row = ui->tableView->currentIndex().row();
-        if(!proxy->removeRow(row))
+
+        if(sectionIsOpen == false)
+        {
+            QString id_parent = ui->tableView->selectionModel()->selectedRows(0).at(0).data().toString();
+            QSqlQuery query("SELECT Name FROM services WHERE ID_Parent=" + id_parent);
+            if(query.next())
+            {
+                msg.setIcon(QMessageBox::Critical);
+                msg.setText("Не могу удалить!");
+                msg.setInformativeText("Есть вложенные услуги!");
+                msg.setStandardButtons(QMessageBox::Ok);
+                msg.exec();
+                return;
+            }
+        }
+        else
+        {
+            QString id_parent = ui->tableView->selectionModel()->selectedRows(0).at(0).data().toString();
+            QSqlQuery query("SELECT ID_Firm FROM servicepresence WHERE ID_Service=" + id_parent);
+            if(query.next())
+            {
+                msg.setIcon(QMessageBox::Critical);
+                msg.setText("Не могу удалить!");
+                msg.setInformativeText("Данная услуга есть в фирмах!");
+                msg.setStandardButtons(QMessageBox::Ok);
+                msg.exec();
+                return;
+            }
+        }
+
+        if(!proxy->removeRow(row) || !proxy->submit())
         {
             qDebug() << "Error! : " + model->lastError().text();
             qDebug() << "----------------------------------------";
@@ -135,6 +160,7 @@ void ServiceSection::deleteSection()
             msg.exec();
             return;
         }
+
         if(!model->submitAll())
         {
             qDebug() << "Error! : " + model->lastError().text();
@@ -148,6 +174,7 @@ void ServiceSection::deleteSection()
             msg.exec();
             return;
         }
+
         if(row > 1)
             ui->tableView->selectRow(row - 1);
         else
@@ -201,6 +228,7 @@ void ServiceSection::on_tableView_customContextMenuRequested(const QPoint &pos)
 
 void ServiceSection::backToSections()
 {
+    model->setTable("services");
     model->setFilter("ID_Parent IS NULL");
     if(!model->select())
     {
@@ -211,13 +239,6 @@ void ServiceSection::backToSections()
     ui->tableView->selectRow(selectedSection);
     ui->tableView->setFocus();
 }
-
-#include <QLineEdit>
-#include <QComboBox>
-#include <QLabel>
-#include <QGridLayout>
-#include <QDialogButtonBox>
-#include <QSqlQuery>
 
 void ServiceSection::editSection()
 {
@@ -301,13 +322,26 @@ void ServiceSection::editSection()
             }
             if(!model->submitAll())
             {
-                QMessageBox::critical(this, "Ошибка", "Недопустимое имя", QMessageBox::Ok);
+                QMessageBox::critical(this, "Ошибка", model->lastError().text(), QMessageBox::Ok);
                 goto START;
             }
         }
     }
 }
 
+void ServiceSection::selectData()
+{
+    model->setFilter("ID_Parent IS NULL");
+    if(!model->select())
+    {
+        qDebug() << "Error : " + model->lastError().text();
+        qDebug() << model->query().executedQuery();
+        return;
+    }
+    sectionIsOpen = false;
+}
+
+#include "mainwindow.h"
 void ServiceSection::keyPressEvent(QKeyEvent *event)
 {
     if(sectionIsOpen == true && event->key() == Qt::Key_Escape)
@@ -321,5 +355,17 @@ void ServiceSection::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    QDialog::keyPressEvent(event);
+    if(event->key() == Qt::Key_F3 || event->key() == Qt::Key_F2)
+    {
+        this->parentWidget()->activateWindow();
+    }
+
+    if(event->key() == Qt::Key_F1)
+    {
+        MainWindow *mainw = qobject_cast<MainWindow*>(this->parent());
+        mainw->activateSearchWindows();
+    }
+
+    QWidget::keyPressEvent(event);
 }
+

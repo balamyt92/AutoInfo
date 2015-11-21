@@ -20,6 +20,7 @@ public:
     ~FirmDialog();
     void setModel(QAbstractItemModel *model);
     void setCurrent(QModelIndex &index);
+    void setCurrent(int index);
     void setReadOnly(bool flag);
 
 private:

@@ -31,7 +31,6 @@
     </property>
     <addaction name="actionFirms"/>
     <addaction name="actionMarks"/>
-    <addaction name="actionServices"/>
     <addaction name="actionDetails"/>
    </widget>
    <widget class="QMenu" name="menu_2">

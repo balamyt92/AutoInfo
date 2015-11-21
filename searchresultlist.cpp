@@ -17,6 +17,7 @@ SearchResultList::SearchResultList(QWidget *parent) :
     menu->addAction("Подрбнее", this, SLOT(openFirm()), Qt::Key_Enter);
 
     this->restoreGeometry(settings->value("searchDialog/geometry").toByteArray());
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openFirm()));
 }
 
 SearchResultList::~SearchResultList()

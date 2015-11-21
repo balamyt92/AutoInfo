@@ -24,6 +24,7 @@ FilterResult::FilterResult(QWidget *parent) :
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
 
     this->restoreGeometry(settings->value("filterResult/geometry").toByteArray());
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openFirm()));
 }
 
 FilterResult::~FilterResult()

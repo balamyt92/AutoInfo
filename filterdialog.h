@@ -49,6 +49,10 @@ private:
 
     QStringList         id_detail;
     QStringList         name_detail;
+
+    // QWidget interface
+protected:
+    void keyPressEvent(QKeyEvent *e);
 };
 
 #endif // FILTERDIALOG_H

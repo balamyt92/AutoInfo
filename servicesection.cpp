@@ -22,6 +22,7 @@ ServiceSection::ServiceSection(QWidget *parent) :
     menu->addAction("Изменить...", this, SLOT(editSection()), Qt::CTRL + Qt::Key_U);
     menu->addAction("Добавить...", this, SLOT(addSection()), Qt::CTRL + Qt::Key_A);
     menu->addAction("Удалить...", this, SLOT(deleteSection()), Qt::CTRL + Qt::Key_D);
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openSection()));
 
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("serviceSectionDialog/geometry").toByteArray());
@@ -367,3 +368,4 @@ void ServiceSection::keyPressEvent(QKeyEvent *event)
 
     QWidget::keyPressEvent(event);
 }
+

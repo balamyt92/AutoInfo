@@ -353,3 +353,12 @@ void FilterDialog::selectBeginData()
     connect(ui->markBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setEngines()));
 }
 
+void FilterDialog::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+        this->on_searchButton_clicked();
+    }
+
+    QWidget::keyPressEvent(e);
+}
+

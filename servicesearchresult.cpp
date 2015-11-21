@@ -25,6 +25,7 @@ ServiceSearchResult::ServiceSearchResult(QWidget *parent) :
     ui->tableView->sortByColumn(1, Qt::AscendingOrder);
 
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(openFirm()));
 }
 
 ServiceSearchResult::~ServiceSearchResult()

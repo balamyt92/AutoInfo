@@ -18,8 +18,7 @@ FilterResult::FilterResult(QWidget *parent) :
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    ui->tableView->setSortingEnabled(true);
-    ui->tableView->sortByColumn(1, Qt::AscendingOrder);
+    ui->tableView->setSortingEnabled(false);
 
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
 
@@ -45,7 +44,9 @@ FilterResult::~FilterResult()
 
 void FilterResult::setModel(QAbstractItemModel *model)
 {
-    ui->tableView->setModel(model);
+    proxy = new FilterResulpProxyModel(this);
+    proxy->setSourceModel(model);
+    ui->tableView->setModel(proxy);
     ui->tableView->setColumnWidth(0, settings->value("filterResult/column_0", 100).toInt());
     ui->tableView->setColumnWidth(1, settings->value("filterResult/column_1", 100).toInt());
     ui->tableView->setColumnWidth(2, settings->value("filterResult/column_2", 100).toInt());
@@ -58,6 +59,10 @@ void FilterResult::setModel(QAbstractItemModel *model)
     ui->tableView->setColumnWidth(9, settings->value("filterResult/column_9", 100).toInt());
     ui->tableView->resizeRowsToContents();
     ui->tableView->selectRow(0);
+    connect(ui->tableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
+            ui->tableView, SLOT(resizeRowsToContents()));
+    changeColor();
+
 }
 
 void FilterResult::on_tableView_customContextMenuRequested(const QPoint &pos)
@@ -98,6 +103,25 @@ void FilterResult::openFirm()
     fd->exec();
     delete fd;
     delete firm;
+}
+
+#include "colordelegate.h"
+void FilterResult::changeColor()
+{
+    bool flag = false;
+    for (int i = 1; i < proxy->rowCount(); ++i)
+    {
+        if(proxy->index(i, 0).data().toInt() != proxy->index(i - 1, 0).data().toInt()) {
+            if(flag) {
+                flag = false;
+            }
+            else {
+                flag = true;
+            }
+        }
+        if(flag)
+            ui->tableView->setItemDelegateForRow(i,new ColorDelegate(ui->tableView));
+    }
 }
 
 void FilterResult::keyPressEvent(QKeyEvent *event)

@@ -14,10 +14,10 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
+   <item row="1" column="3">
+    <widget class="QPushButton" name="filtrButton">
      <property name="text">
-      <string>Всего фирм</string>
+      <string>Фильтр</string>
      </property>
     </widget>
    </item>
@@ -31,14 +31,14 @@
    <item row="1" column="2">
     <widget class="QLineEdit" name="lineEdit"/>
    </item>
-   <item row="1" column="3">
-    <widget class="QPushButton" name="filtrButton">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Фильтр</string>
+      <string>Всего фирм</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0" colspan="5">
     <widget class="QTableView" name="tableView">
      <property name="alternatingRowColors">
       <bool>true</bool>
@@ -50,6 +50,11 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tableView</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>filtrButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

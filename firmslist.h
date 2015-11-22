@@ -38,6 +38,7 @@ private slots:
     void addFirm();
     void deleteFirm();
     void editFirm();
+    void enableSort();
 
 private:
     Ui::FirmsList           *ui;
@@ -45,7 +46,6 @@ private:
     FirmProxyModel          *proxy;
     QMenu                   *menu;
     Settings                *settings;
-
 };
 
 #endif // FIRMSLIST_H

@@ -11,6 +11,7 @@ FirmsList::FirmsList(QWidget *parent) :
     model = new QSqlTableModel(this);
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable("firms");
+    model->setSort(1, Qt::AscendingOrder);
     if(!model->select())
     {
         qDebug() << "Error : " + model->lastError().text();
@@ -40,12 +41,6 @@ FirmsList::FirmsList(QWidget *parent) :
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    ui->tableView->setSortingEnabled(true);
-    ui->tableView->sortByColumn(1, Qt::AscendingOrder);
-
-    ui->tableView->resizeColumnsToContents();
-    ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->verticalHeader()->hide();
     ui->tableView->hideColumn(4);
     ui->tableView->hideColumn(5);
     ui->tableView->hideColumn(6);
@@ -59,6 +54,8 @@ FirmsList::FirmsList(QWidget *parent) :
     ui->tableView->hideColumn(14);
     ui->tableView->hideColumn(15);
 
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui->tableView->setTabKeyNavigation(false);
 
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("firmList/geometry").toByteArray());
@@ -67,11 +64,21 @@ FirmsList::FirmsList(QWidget *parent) :
     ui->tableView->setFocus();
 
     ui->countLable->setText(QString::number(model->rowCount()));
+
+    connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(enableSort()));
+
+
+    ui->tableView->setColumnWidth(0, settings->value("firmList/column_0", 100).toInt());
+    ui->tableView->setColumnWidth(1, settings->value("firmList/column_1", 100).toInt());
+    ui->tableView->setColumnWidth(2, settings->value("firmList/column_2", 100).toInt());
 }
 
 FirmsList::~FirmsList()
 {
     settings->setValue("firmList/geometry", this->saveGeometry());
+    settings->setValue("firmList/column_0", ui->tableView->columnWidth(0));
+    settings->setValue("firmList/column_1", ui->tableView->columnWidth(1));
+    settings->setValue("firmList/column_2", ui->tableView->columnWidth(2));
     delete ui;
 }
 
@@ -198,4 +205,10 @@ void FirmsList::editFirm()
     while (model->canFetchMore()) {
         model->fetchMore();
     }
+}
+
+void FirmsList::enableSort()
+{
+    ui->tableView->setSortingEnabled(true);
+    disconnect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, 0);
 }

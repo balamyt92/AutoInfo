@@ -8,6 +8,7 @@
 #include <QDebug>
 #include "settings.h"
 #include "firmdialog.h"
+#include "filterresulpproxymodel.h"
 
 namespace Ui {
 class FilterResult;
@@ -30,6 +31,7 @@ private:
     Ui::FilterResult    *ui;
     QMenu               *menu;
     Settings            *settings;
+    FilterResulpProxyModel *proxy;
 
 protected:
     void keyPressEvent(QKeyEvent *event);

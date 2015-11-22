@@ -26,6 +26,7 @@ public:
 private slots:
     void on_tableView_customContextMenuRequested(const QPoint &pos);
     void openFirm();
+    void changeColor();
 
 private:
     Ui::FilterResult    *ui;

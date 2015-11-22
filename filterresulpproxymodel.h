@@ -14,7 +14,6 @@ class FilterResulpProxyModel : public QSortFilterProxyModel
 public:
     FilterResulpProxyModel(QObject *parent);
     QVariant data(const QModelIndex &index, int role) const;
-
 };
 
 #endif // FILTERRESULPPROXYMODEL_H

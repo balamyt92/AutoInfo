@@ -61,6 +61,8 @@ void FilterResult::setModel(QAbstractItemModel *model)
     ui->tableView->selectRow(0);
     connect(ui->tableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)),
             ui->tableView, SLOT(resizeRowsToContents()));
+    changeColor();
+
 }
 
 void FilterResult::on_tableView_customContextMenuRequested(const QPoint &pos)
@@ -101,6 +103,25 @@ void FilterResult::openFirm()
     fd->exec();
     delete fd;
     delete firm;
+}
+
+#include "colordelegate.h"
+void FilterResult::changeColor()
+{
+    bool flag = false;
+    for (int i = 1; i < proxy->rowCount(); ++i)
+    {
+        if(proxy->index(i, 0).data().toInt() != proxy->index(i - 1, 0).data().toInt()) {
+            if(flag) {
+                flag = false;
+            }
+            else {
+                flag = true;
+            }
+        }
+        if(flag)
+            ui->tableView->setItemDelegateForRow(i,new ColorDelegate(ui->tableView));
+    }
 }
 
 void FilterResult::keyPressEvent(QKeyEvent *event)

@@ -124,32 +124,12 @@ void FirmsList::openServices()
     if(index.isEmpty())
         return;
 
-    QDialog *d = new QDialog(this);
-    d->setWindowFlags(Qt::Window);
-    QTableView *v = new QTableView(d);
-    v->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    QGridLayout *grid = new QGridLayout(d);
-    grid->addWidget(v,0,0,0,0);
-    d->setLayout(grid);
-
-    QSqlRelationalTableModel *price = new QSqlRelationalTableModel(d);
-    price->setTable("servicepresence");
-    price->setFilter("ID_Firm=" + index.first().data().toString());
-    price->setRelation(0, QSqlRelation("services", "ID", "Name"));
-
-    qDebug() << price->lastError().text();
-    qDebug() << price->filter();
-
-    price->select();
-
-    while (price->canFetchMore()) {
-        price->fetchMore();
+    PriceList *price = new PriceList(this);
+    if(!price->openService(index.first().data().toString())) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не могу открыть прайс!"));
     }
-
-    v->setModel(price);
-    d->resize(800, 800);
-    d->exec();
-    delete d;
+    price->exec();
+    delete price;
 }
 
 void FirmsList::addFirm()

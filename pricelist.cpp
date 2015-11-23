@@ -25,27 +25,42 @@ PriceList::PriceList(QWidget *parent) :
     this->restoreGeometry(settings->value("priceList/geometry").toByteArray());
 
     connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(enableSort(int)));
+
+    serviceIsOpen = false;
 }
 
 PriceList::~PriceList()
 {
     settings->setValue("priceList/geometry", this->saveGeometry());
-    settings->setValue("priceList/column_0", ui->tableView->columnWidth(0));
-    settings->setValue("priceList/column_1", ui->tableView->columnWidth(1));
-    settings->setValue("priceList/column_2", ui->tableView->columnWidth(2));
-    settings->setValue("priceList/column_3", ui->tableView->columnWidth(3));
-    settings->setValue("priceList/column_4", ui->tableView->columnWidth(4));
-    settings->setValue("priceList/column_5", ui->tableView->columnWidth(5));
-    settings->setValue("priceList/column_6", ui->tableView->columnWidth(6));
-    settings->setValue("priceList/column_7", ui->tableView->columnWidth(7));
-    settings->setValue("priceList/column_8", ui->tableView->columnWidth(8));
-    settings->setValue("priceList/column_9", ui->tableView->columnWidth(9));
-    settings->setValue("priceList/column_10", ui->tableView->columnWidth(10));
+    if(serviceIsOpen) {
+
+        settings->setValue("priceList/column_0_service", ui->tableView->columnWidth(0));
+        settings->setValue("priceList/column_1_service", ui->tableView->columnWidth(1));
+        settings->setValue("priceList/column_2_service", ui->tableView->columnWidth(2));
+        settings->setValue("priceList/column_3_service", ui->tableView->columnWidth(3));
+        settings->setValue("priceList/column_4_service", ui->tableView->columnWidth(4));
+    }
+    else {
+        settings->setValue("priceList/column_0", ui->tableView->columnWidth(0));
+        settings->setValue("priceList/column_1", ui->tableView->columnWidth(1));
+        settings->setValue("priceList/column_2", ui->tableView->columnWidth(2));
+        settings->setValue("priceList/column_3", ui->tableView->columnWidth(3));
+        settings->setValue("priceList/column_4", ui->tableView->columnWidth(4));
+        settings->setValue("priceList/column_5", ui->tableView->columnWidth(5));
+        settings->setValue("priceList/column_6", ui->tableView->columnWidth(6));
+        settings->setValue("priceList/column_7", ui->tableView->columnWidth(7));
+        settings->setValue("priceList/column_8", ui->tableView->columnWidth(8));
+        settings->setValue("priceList/column_9", ui->tableView->columnWidth(9));
+        settings->setValue("priceList/column_10", ui->tableView->columnWidth(10));
+    }
     delete ui;
 }
 
 bool PriceList::setFirmID(QString id)
 {
+    if(serviceIsOpen)
+        return false;
+
     ID = id;
     model->setTable("carpresenceen");
     model->setFilter("ID_Firm=" + ID);
@@ -54,7 +69,7 @@ bool PriceList::setFirmID(QString id)
     model->setRelation(2, QSqlRelation("carendetailnames", "ID", "Name"));
     model->setRelation(5, QSqlRelation("carbodymodelsen", "ID", "Name"));
     model->setRelation(6, QSqlRelation("carenginemodelsen", "ID", "Name"));
-    model->setSort(1, Qt::AscendingOrder);
+    model->setSort(0, Qt::AscendingOrder);
     if(!model->select()) {
         qDebug() << model->lastError().text();
         return false;
@@ -93,10 +108,40 @@ bool PriceList::setFirmID(QString id)
     return true;
 }
 
+bool PriceList::openService(QString id)
+{
+    serviceIsOpen = true;
+    ID = id;
+    model->setTable("servicepresence");
+    model->setFilter("ID_Firm=" + ID);
+    model->setRelation(0, QSqlRelation("services", "ID", "Name"));
+    model->setSort(0, Qt::AscendingOrder);
+    if(!model->select()) {
+        qDebug() << model->lastError().text();
+        return false;
+    }
+    model->setHeaderData(0, Qt::Horizontal, tr("Услуга"));
+    model->setHeaderData(1, Qt::Horizontal, tr("ID Фирмы"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Коментарий"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Машины"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Цена"));
+
+    ui->tableView->setModel(model);
+    ui->tableView->setSortingEnabled(true);
+
+    ui->tableView->setColumnWidth(0, settings->value("priceList/column_0_service", 100).toInt());
+    ui->tableView->setColumnWidth(1, settings->value("priceList/column_1_service", 100).toInt());
+    ui->tableView->setColumnWidth(2, settings->value("priceList/column_2_service", 100).toInt());
+    ui->tableView->setColumnWidth(3, settings->value("priceList/column_3_service", 100).toInt());
+    ui->tableView->setColumnWidth(4, settings->value("priceList/column_4_service", 100).toInt());
+
+    return true;
+}
+
 void PriceList::enableSort(int colum)
 {
     model->setSort(colum, Qt::AscendingOrder);
     model->select();
     ui->tableView->horizontalHeader()->setSortIndicator(colum, Qt::AscendingOrder);
-//    disconnect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, 0);
+    //    disconnect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, 0);
 }

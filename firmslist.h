@@ -15,6 +15,7 @@
 
 #include "settings.h"
 #include "firmproxymodel.h"
+#include "pricelist.h"
 
 namespace Ui {
 class FirmsList;

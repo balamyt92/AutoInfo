@@ -110,36 +110,12 @@ void FirmsList::openPrice()
     if(index.isEmpty())
         return;
 
-    QDialog *d = new QDialog(this);
-    d->setWindowFlags(Qt::Window);
-    QTableView *v = new QTableView(d);
-    v->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    QGridLayout *grid = new QGridLayout(d);
-    grid->addWidget(v,0,0,0,0);
-    d->setLayout(grid);
-
-    QSqlRelationalTableModel *price = new QSqlRelationalTableModel(d);
-    price->setTable("carpresenceen");
-    price->setFilter("ID_Firm=" + index.first().data().toString());
-    price->setRelation(0, QSqlRelation("carmarksen", "ID", "Name"));
-    price->setRelation(1, QSqlRelation("carmodelsen", "ID", "Name"));
-    price->setRelation(2, QSqlRelation("carendetailnames", "ID", "Name"));
-    price->setRelation(5, QSqlRelation("carbodymodelsen", "ID", "Name"));
-    price->setRelation(6, QSqlRelation("carenginemodelsen", "ID", "Name"));
-
-    qDebug() << price->lastError().text();
-    qDebug() << price->filter();
-
-    price->select();
-
-    while (price->canFetchMore()) {
-        price->fetchMore();
+    PriceList *price = new PriceList(this);
+    if(!price->setFirmID(index.first().data().toString())) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не могу открыть прайс!"));
     }
-
-    v->setModel(price);
-    d->resize(800, 800);
-    d->exec();
-    delete d;
+    price->exec();
+    delete price;
 }
 
 void FirmsList::openServices()

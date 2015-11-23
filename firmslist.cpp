@@ -11,6 +11,7 @@ FirmsList::FirmsList(QWidget *parent) :
     model = new QSqlTableModel(this);
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->setTable("firms");
+    model->setSort(1, Qt::AscendingOrder);
     if(!model->select())
     {
         qDebug() << "Error : " + model->lastError().text();
@@ -40,12 +41,6 @@ FirmsList::FirmsList(QWidget *parent) :
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    ui->tableView->setSortingEnabled(true);
-    ui->tableView->sortByColumn(1, Qt::AscendingOrder);
-
-    ui->tableView->resizeColumnsToContents();
-    ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->verticalHeader()->hide();
     ui->tableView->hideColumn(4);
     ui->tableView->hideColumn(5);
     ui->tableView->hideColumn(6);
@@ -59,6 +54,8 @@ FirmsList::FirmsList(QWidget *parent) :
     ui->tableView->hideColumn(14);
     ui->tableView->hideColumn(15);
 
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui->tableView->setTabKeyNavigation(false);
 
     settings = Settings::getInstance();
     this->restoreGeometry(settings->value("firmList/geometry").toByteArray());
@@ -67,11 +64,21 @@ FirmsList::FirmsList(QWidget *parent) :
     ui->tableView->setFocus();
 
     ui->countLable->setText(QString::number(model->rowCount()));
+
+    connect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(enableSort()));
+
+
+    ui->tableView->setColumnWidth(0, settings->value("firmList/column_0", 100).toInt());
+    ui->tableView->setColumnWidth(1, settings->value("firmList/column_1", 100).toInt());
+    ui->tableView->setColumnWidth(2, settings->value("firmList/column_2", 100).toInt());
 }
 
 FirmsList::~FirmsList()
 {
     settings->setValue("firmList/geometry", this->saveGeometry());
+    settings->setValue("firmList/column_0", ui->tableView->columnWidth(0));
+    settings->setValue("firmList/column_1", ui->tableView->columnWidth(1));
+    settings->setValue("firmList/column_2", ui->tableView->columnWidth(2));
     delete ui;
 }
 
@@ -103,36 +110,12 @@ void FirmsList::openPrice()
     if(index.isEmpty())
         return;
 
-    QDialog *d = new QDialog(this);
-    d->setWindowFlags(Qt::Window);
-    QTableView *v = new QTableView(d);
-    v->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    QGridLayout *grid = new QGridLayout(d);
-    grid->addWidget(v,0,0,0,0);
-    d->setLayout(grid);
-
-    QSqlRelationalTableModel *price = new QSqlRelationalTableModel(d);
-    price->setTable("carpresenceen");
-    price->setFilter("ID_Firm=" + index.first().data().toString());
-    price->setRelation(0, QSqlRelation("carmarksen", "ID", "Name"));
-    price->setRelation(1, QSqlRelation("carmodelsen", "ID", "Name"));
-    price->setRelation(2, QSqlRelation("carendetailnames", "ID", "Name"));
-    price->setRelation(5, QSqlRelation("carbodymodelsen", "ID", "Name"));
-    price->setRelation(6, QSqlRelation("carenginemodelsen", "ID", "Name"));
-
-    qDebug() << price->lastError().text();
-    qDebug() << price->filter();
-
-    price->select();
-
-    while (price->canFetchMore()) {
-        price->fetchMore();
+    PriceList *price = new PriceList(this);
+    if(!price->setFirmID(index.first().data().toString())) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не могу открыть прайс!"));
     }
-
-    v->setModel(price);
-    d->resize(800, 800);
-    d->exec();
-    delete d;
+    price->exec();
+    delete price;
 }
 
 void FirmsList::openServices()
@@ -141,32 +124,12 @@ void FirmsList::openServices()
     if(index.isEmpty())
         return;
 
-    QDialog *d = new QDialog(this);
-    d->setWindowFlags(Qt::Window);
-    QTableView *v = new QTableView(d);
-    v->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    QGridLayout *grid = new QGridLayout(d);
-    grid->addWidget(v,0,0,0,0);
-    d->setLayout(grid);
-
-    QSqlRelationalTableModel *price = new QSqlRelationalTableModel(d);
-    price->setTable("servicepresence");
-    price->setFilter("ID_Firm=" + index.first().data().toString());
-    price->setRelation(0, QSqlRelation("services", "ID", "Name"));
-
-    qDebug() << price->lastError().text();
-    qDebug() << price->filter();
-
-    price->select();
-
-    while (price->canFetchMore()) {
-        price->fetchMore();
+    PriceList *price = new PriceList(this);
+    if(!price->openService(index.first().data().toString())) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не могу открыть прайс!"));
     }
-
-    v->setModel(price);
-    d->resize(800, 800);
-    d->exec();
-    delete d;
+    price->exec();
+    delete price;
 }
 
 void FirmsList::addFirm()
@@ -198,4 +161,10 @@ void FirmsList::editFirm()
     while (model->canFetchMore()) {
         model->fetchMore();
     }
+}
+
+void FirmsList::enableSort()
+{
+    ui->tableView->setSortingEnabled(true);
+    disconnect(ui->tableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, 0);
 }

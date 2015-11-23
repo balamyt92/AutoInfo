@@ -8,6 +8,7 @@
 #include <QDebug>
 #include "settings.h"
 #include "firmdialog.h"
+#include "filterresulpproxymodel.h"
 
 namespace Ui {
 class FilterResult;
@@ -25,11 +26,13 @@ public:
 private slots:
     void on_tableView_customContextMenuRequested(const QPoint &pos);
     void openFirm();
+    void changeColor();
 
 private:
     Ui::FilterResult    *ui;
     QMenu               *menu;
     Settings            *settings;
+    FilterResulpProxyModel *proxy;
 
 protected:
     void keyPressEvent(QKeyEvent *event);

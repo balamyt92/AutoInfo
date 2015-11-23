@@ -26,6 +26,7 @@ public:
     explicit PriceList(QWidget *parent = 0);
     ~PriceList();
     bool setFirmID(QString id);
+    bool openService(QString id);
 
 private:
     Ui::PriceList               *ui;
@@ -34,6 +35,7 @@ private:
     QMenu                       *menu;
     Settings                    *settings;
     QString                     ID;
+    bool                        serviceIsOpen;
 
 public slots:
     void enableSort(int colum);

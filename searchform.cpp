@@ -29,7 +29,7 @@ void SearchForm::on_pushButton_clicked()
         sr->exec();
         delete sr;
         ui->searchLine->selectAll();
-        ui->appendLine->selectAll();
+        ui->appendLine->selectAll(); //#14 issue fix
     }
 }
 

@@ -26,56 +26,46 @@ SearchResultList::~SearchResultList()
     delete ui;
 }
 
-void SearchResultList::setSearch(QString text)
+void SearchResultList::setSearch(QString text, QString append)
 {
     model->setTable("firms");
-    QStringList tmp = text.split(" ");
-    if(tmp.count() > 1) {
-        model->setFilter("(Name LIKE '%" + tmp.first() + "%' OR "
-                         "Address LIKE '%" + tmp.first() + "%' OR "
-                         "Phone LIKE '%" + tmp.first() + "%' OR "
-                         "Comment LIKE '%" + tmp.first() + "%' OR "
-                         "ActivityType LIKE '%" + tmp.first() + "%' OR "
-                         "OrganizationType LIKE '%" + tmp.first() + "%' OR "
-                         "District LIKE '%" + tmp.first() + "%' OR "
-                         "Fax LIKE '%" + tmp.first() + "%' OR "
-                         "Email LIKE '%" + tmp.first() + "%' OR "
-                         "URL LIKE '%" + tmp.first() + "%' OR "
-                         "OperatingMode LIKE '%" + tmp.first() + "%') AND "
-                         "(Name LIKE '%" + tmp.at(1) + "%' OR "
-                          "Address LIKE '%" + tmp.at(1) + "%' OR "
-                          "Phone LIKE '%" + tmp.at(1) + "%' OR "
-                          "Comment LIKE '%" + tmp.at(1) + "%' OR "
-                          "ActivityType LIKE '%" + tmp.at(1) + "%' OR "
-                          "OrganizationType LIKE '%" + tmp.at(1) + "%' OR "
-                          "District LIKE '%" + tmp.at(1) + "%' OR "
-                          "Fax LIKE '%" + tmp.at(1) + "%' OR "
-                          "Email LIKE '%" + tmp.at(1) + "%' OR "
-                          "URL LIKE '%" + tmp.at(1) + "%' OR "
-                          "OperatingMode LIKE '%" + tmp.at(1) + "%')");
-    }
-    else
-    {
-        model->setFilter("Name LIKE '%" + text + "%' OR "
-                         "Address LIKE '%" + text + "%' OR "
-                         "Phone LIKE '%" + text + "%' OR "
-                         "Comment LIKE '%" + text + "%' OR "
-                         "ActivityType LIKE '%" + text + "%' OR "
-                         "OrganizationType LIKE '%" + text + "%' OR "
-                         "District LIKE '%" + text + "%' OR "
-                         "Fax LIKE '%" + text + "%' OR "
-                         "Email LIKE '%" + text + "%' OR "
-                         "URL LIKE '%" + text + "%' OR "
-                         "OperatingMode LIKE '%" + text + "%'");
+    QString where = "(Name LIKE '%" + text + "%' OR "
+                    "Address LIKE '%" + text + "%' OR "
+                    "Phone LIKE '%" + text + "%' OR "
+                    "Comment LIKE '%" + text + "%' OR "
+                    "ActivityType LIKE '%" + text + "%' OR "
+                    "OrganizationType LIKE '%" + text + "%' OR "
+                    "District LIKE '%" + text + "%' OR "
+                    "Fax LIKE '%" + text + "%' OR "
+                    "Email LIKE '%" + text + "%' OR "
+                    "URL LIKE '%" + text + "%' OR "
+                    "OperatingMode LIKE '%" + text + "%')";
+
+    if(!append.isEmpty()) {
+        QStringList tmp = append.split(" ");
+        for (int i = 0; i < tmp.count(); ++i) {
+            where += "AND (Name LIKE '%" + tmp.at(i) + "%' OR "
+                          "Address LIKE '%" + tmp.at(i) + "%' OR "
+                          "Phone LIKE '%" + tmp.at(i) + "%' OR "
+                          "Comment LIKE '%" + tmp.at(i) + "%' OR "
+                          "ActivityType LIKE '%" + tmp.at(i) + "%' OR "
+                          "OrganizationType LIKE '%" + tmp.at(i) + "%' OR "
+                          "District LIKE '%" + tmp.at(i) + "%' OR "
+                          "Fax LIKE '%" + tmp.at(i) + "%' OR "
+                          "Email LIKE '%" + tmp.at(i) + "%' OR "
+                          "URL LIKE '%" + tmp.at(i) + "%' OR "
+                          "OperatingMode LIKE '%" + tmp.at(i) + "%')";
+        }
     }
 
+    model->setFilter(where);
     if(!model->select())
     {
         qDebug() << "Error!!!!! :" + model->lastError().text();
         return;
     }
 
-    ui->tableView->setModel(proxy);
+    ui->tableView->verticalHeader()->hide();
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -85,9 +75,11 @@ void SearchResultList::setSearch(QString text)
     ui->tableView->setSortingEnabled(true);
     ui->tableView->sortByColumn(1, Qt::AscendingOrder);
 
+    ui->tableView->setModel(proxy);
+
     ui->tableView->resizeColumnsToContents();
+    ui->tableView->resizeRowsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
-    ui->tableView->verticalHeader()->hide();
     ui->tableView->hideColumn(0);
     ui->tableView->hideColumn(4);
     ui->tableView->hideColumn(5);

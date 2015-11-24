@@ -23,7 +23,7 @@ class SearchResultList : public QDialog
 public:
     explicit SearchResultList(QWidget *parent = 0);
     ~SearchResultList();
-    void setSearch(QString text);
+    void setSearch(QString text, QString append);
 
 private slots:
     void on_tableView_customContextMenuRequested(const QPoint &pos);
